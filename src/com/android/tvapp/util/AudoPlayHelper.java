@@ -58,7 +58,9 @@ public class AudoPlayHelper implements OnBufferingUpdateListener,
 
     Handler handleProgress = new Handler() {
         public void handleMessage(Message msg) {
-
+            if (mediaPlayer == null) {
+                return;
+            }
             int position = mediaPlayer.getCurrentPosition();
             int duration = mediaPlayer.getDuration();
 
