@@ -9,6 +9,7 @@ import android.widget.ViewFlipper;
 
 import com.android.tvapp.R;
 import com.android.tvapp.util.AudoPlayHelper;
+import com.android.tvapp.util.Log;
 import com.android.tvapp.util.VolleyImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
 
@@ -66,6 +67,7 @@ public class ShowAudioLayout extends RelativeLayout implements OnCompleteListene
         if (mViewFlipper != null) {
             addBgImage();
             mViewFlipper.startFlipping();
+            Log.d(Log.TAG, "View Count : " + mViewFlipper.getChildCount());
         }
     }
 

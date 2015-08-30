@@ -1,6 +1,6 @@
 .settings
 bin/
-gin/
+gen/
 .classpath
 .project
 ic_launcher-web.png
