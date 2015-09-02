@@ -1,0 +1,42 @@
+[{
+    "ip": "192.168.5.22",
+    "name": "会议室",
+    "type": "audio",
+    "audiourl": "http://yinyueshiting.baidu.com/data2/music/31266477/87757815120064.mp3?xcode=ac9504977ba7c59b350a5c038dd045b5",
+    "imgurl": ["http://192.168.5.254:8080/multimedia/upload/music/kdf.jpg",
+    "http://192.168.5.254:8080/multimedia/upload/image/kdf.jpg"]
+},
+{
+    "ip": "192.168.5.22",
+    "name": "会议室",
+    "type": "video",
+    "videourl": "http://192.168.5.254:8080/multimedia/upload/video/afas.mp4"
+},
+{
+    "ip": "192.168.5.20",
+    "type": "text",
+    "name": "会议室",
+    "content": "这里是文字轮播的详细内容",
+    "time": "30"
+},
+{
+    "ip": "192.168.5.20",
+    "name": "会议室",
+    "type": "audio",
+    "audiourl": "http://yinyueshiting.baidu.com/data2/music/31266477/87757815120064.mp3?xcode=ac9504977ba7c59b350a5c038dd045b5",
+    "imgurl": ["http://192.168.5.254:8080/multimedia/upload/music/kdf.jpg",
+    "http://192.168.5.254:8080/multimedia/upload/image/kdf.jpg"]
+},
+{
+    "ip": "192.168.5.20",
+    "name": "会议室",
+    "type": "video",
+    "videourl": "http://192.168.5.254:8080/multimedia/upload/video/afas.mp4"
+},
+{
+    "ip": "192.168.5.22",
+    "type": "text",
+    "name": "会议室",
+    "content": "这里是文字轮播的详细内容",
+    "time": "30"
+}]

@@ -81,7 +81,7 @@ public class AudoPlayHelper implements OnBufferingUpdateListener,
         try {
             mediaPlayer.reset();
             mediaPlayer.setDataSource(videoUrl);
-            mediaPlayer.prepare();// prepare之后自动播放
+            mediaPlayer.prepareAsync();// prepare之后自动播放
         } catch (IllegalArgumentException e) {
             Log.d(Log.TAG, "error : " + e);
             if (mOnCompleteListener != null) {

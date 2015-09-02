@@ -33,6 +33,7 @@ public class Utils {
             Log.d(Log.TAG, "error : " + e);
         }
         return ipaddress;
-
     }
+
+    public static final String TASK_COMPLETE = "com.android.tvapp.intent.action.TASK_COMPLETE";
 }

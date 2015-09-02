@@ -1,52 +1,52 @@
 package com.android.tvapp.view;
 
-import android.content.Context;
-import android.graphics.Color;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
-import android.util.AttributeSet;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.MediaController;
-import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.android.tvapp.R;
 import com.android.tvapp.util.Log;
+import com.android.tvapp.util.Utils;
 
-public class ShowVideoLayout extends RelativeLayout implements OnCompletionListener, OnErrorListener, OnPreparedListener {
+public class VideoFragment extends Fragment implements OnCompletionListener, OnErrorListener, OnPreparedListener {
 
     private VideoView mVideoView;
-    private OnCompleteListener mOnCompleteListener;
     private View mProgressBar;
-
-    public ShowVideoLayout(Context context) {
-        super(context);
-    }
-    public ShowVideoLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-    public ShowVideoLayout(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
+    private Handler mHandler;
 
     @Override
-    protected void onFinishInflate() {
-        mProgressBar = findViewById(R.id.progressbar);
-        mVideoView = (VideoView) findViewById(R.id.videoview);
-        mVideoView.setMediaController(new MediaController(getContext()));
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.tvapp_showvideo, null);
+        mHandler = new Handler();
+        mProgressBar = view.findViewById(R.id.progressbar);
+        mVideoView = (VideoView) view.findViewById(R.id.videoview);
+        mVideoView.setMediaController(new MediaController(getActivity()));
         mVideoView.setOnCompletionListener(this);
         mVideoView.setOnErrorListener(this);
         mVideoView.setOnPreparedListener(this);
+        mHandler = new Handler();
+        return view;
     }
 
-    public void setOnCompleteListener(OnCompleteListener l) {
-        mOnCompleteListener = l;
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        start();
     }
 
-    public void start() {
+    private void start() {
         Uri uri1 = Uri.parse("rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov");
         Uri uri2 = Uri.parse("file:///storage/emulated/0/≤‚ ‘ ”∆µ_3.mp4");
         Uri uri3 = Uri.parse("http://forum.ea3w.com/coll_ea3w/attach/2008_10/12237832415.3gp");
@@ -57,31 +57,24 @@ public class ShowVideoLayout extends RelativeLayout implements OnCompletionListe
         mProgressBar.setVisibility(View.VISIBLE);
     }
 
-    public void stop() {
-        if (mVideoView != null) {
-            mVideoView.stopPlayback();
-        }
-    }
-
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
-        if (mOnCompleteListener != null) {
-            mOnCompleteListener.onComplete();
-        }
+        Intent intent = new Intent(Utils.TASK_COMPLETE);
+        getActivity().sendBroadcast(intent);
     }
 
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int arg1, int arg2) {
-        if (mOnCompleteListener != null) {
-            mOnCompleteListener.onComplete();
-        }
+        Log.d(Log.TAG, "send video task complete");
+        Intent intent = new Intent(Utils.TASK_COMPLETE);
+        getActivity().sendBroadcast(intent);
         return true;
     }
 
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         Log.d(Log.TAG, "");
-        post(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
                 mProgressBar.setVisibility(View.INVISIBLE);

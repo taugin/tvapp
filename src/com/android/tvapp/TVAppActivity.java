@@ -1,92 +1,81 @@
 package com.android.tvapp;
 
-import android.app.Activity;
+import java.util.ArrayList;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
-import android.widget.ProgressBar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 
+import com.android.tvapp.manager.TaskManager;
 import com.android.tvapp.util.Log;
-import com.android.tvapp.view.OnCompleteListener;
-import com.android.tvapp.view.ShowAudioLayout;
-import com.android.tvapp.view.ShowTextLayout;
-import com.android.tvapp.view.ShowVideoLayout;
+import com.android.tvapp.util.Utils;
+import com.android.tvapp.view.AudioFragment;
+import com.android.tvapp.view.TextFragment;
+import com.android.tvapp.view.VideoFragment;
 
-public class TVAppActivity extends Activity implements OnCompleteListener {
-    private static int sCount = 0;
-    private ProgressBar mProgressBar;
-    private ShowTextLayout mShowTextLayout;
-    private ShowAudioLayout mShowAudioLayout;
-    private ShowVideoLayout mShowVideoLayout;
+public class TVAppActivity extends FragmentActivity {
+    private ArrayList<Fragment> mFragmentList;
+    private int mCurrentIndex = 0;
     private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        register();
         setContentView(R.layout.activity_tvapp);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
-        mShowTextLayout = (ShowTextLayout) findViewById(R.id.showtextlayout);
-        mShowAudioLayout = (ShowAudioLayout) findViewById(R.id.showaudiolayout);
-        mShowVideoLayout = (ShowVideoLayout) findViewById(R.id.showvideolayout);
-        
-        mShowTextLayout.setOnCompleteListener(this);
-        mShowAudioLayout.setOnCompleteListener(this);
-        mShowVideoLayout.setOnCompleteListener(this);
-
+        mFragmentList = new ArrayList<Fragment>();
+        mFragmentList.add(new TextFragment());
+        mFragmentList.add(new AudioFragment());
+        mFragmentList.add(new VideoFragment());
         mHandler = new Handler();
-        showVideoView();
-    }
-
-    private void showHideView() {
-        mShowAudioLayout.stop();
-        mShowVideoLayout.stop();
-        mShowTextLayout.setVisibility(View.GONE);
-        mShowAudioLayout.setVisibility(View.GONE);
-        mShowVideoLayout.setVisibility(View.GONE);
-    }
-
-    private void showTextView() {
-        showHideView();
-        mShowTextLayout.setVisibility(View.VISIBLE);
-        mShowTextLayout.start();
-    }
-
-    private void showAudioView() {
-        showHideView();
-        mShowAudioLayout.setVisibility(View.VISIBLE);
-        mShowAudioLayout.start();
-    }
-
-    private void showVideoView() {
-        showHideView();
-        mShowVideoLayout.setVisibility(View.VISIBLE);
-        mShowVideoLayout.start();
-    }
-
-    
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        mShowTextLayout.stop();
-        mShowAudioLayout.stop();
-        mShowVideoLayout.stop();
+        showFragment();
     }
 
     @Override
-    public void onComplete() {
+    protected void onDestroy() {
+        super.onDestroy();
+        unregister();
+    }
+
+    private void register() {
+        IntentFilter filter = new IntentFilter(Utils.TASK_COMPLETE);
+        registerReceiver(mBroadcastReceiver, filter);
+    }
+
+    private void unregister() {
+        unregisterReceiver(mBroadcastReceiver);
+    }
+
+    private void showFragment() {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                Log.d(Log.TAG, "sCount : " + sCount);
-                if (sCount % 3 == 0) {
-                    showTextView();
-                } else if (sCount % 3 == 1){
-                    showAudioView();
-                } else if (sCount % 3 == 2) {
-                    showVideoView();
-                }
-                sCount++;
+                Fragment fragment = mFragmentList.get(mCurrentIndex);
+                Log.d(Log.TAG, "mCurrentIndex : " + mCurrentIndex + " , fragment : " + fragment);
+                FragmentTransaction transaction = getSupportFragmentManager()
+                        .beginTransaction();
+                transaction.replace(R.id.fragment_layout, fragment);
+                transaction.commitAllowingStateLoss();
             }
         });
     }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) {
+                return ;
+            }
+            if (Utils.TASK_COMPLETE.equals(intent.getAction())) {
+                mCurrentIndex = ++mCurrentIndex % mFragmentList.size();
+                showFragment();
+            }
+        }
+    };
 }
