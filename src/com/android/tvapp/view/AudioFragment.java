@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -17,7 +18,7 @@ import com.android.tvapp.util.Utils;
 import com.android.tvapp.util.VolleyImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
 
-public class AudioFragment extends Fragment implements OnCompleteListener {
+public class AudioFragment extends Fragment implements OnCompleteListener, OnClickListener {
 
     private ViewFlipper mViewFlipper;
     private AudoPlayHelper mAudoPlayHelper;
@@ -35,6 +36,7 @@ public class AudioFragment extends Fragment implements OnCompleteListener {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tvapp_showaudio, null);
         mViewFlipper = (ViewFlipper) view.findViewById(R.id.viewflipper);
+        mViewFlipper.setOnClickListener(this);
         return view;
     }
 
@@ -50,6 +52,9 @@ public class AudioFragment extends Fragment implements OnCompleteListener {
         super.onDestroy();
         if (mViewFlipper != null) {
             mViewFlipper.stopFlipping();
+        }
+        if (mAudoPlayHelper != null) {
+            mAudoPlayHelper.stop();
         }
     }
 
@@ -83,6 +88,13 @@ public class AudioFragment extends Fragment implements OnCompleteListener {
 
     @Override
     public void onComplete() {
+        Log.d(Log.TAG, "send audio task complete");
+        Intent intent = new Intent(Utils.TASK_COMPLETE);
+        getActivity().sendBroadcast(intent);
+    }
+
+    @Override
+    public void onClick(View view) {
         Log.d(Log.TAG, "send audio task complete");
         Intent intent = new Intent(Utils.TASK_COMPLETE);
         getActivity().sendBroadcast(intent);
