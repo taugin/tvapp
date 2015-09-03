@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="custom_ruls" default="help">
+    <property name="release_dir" location="Release" />
+    <xmlproperty file="AndroidManifest.xml" prefix="mymanifest" collapseAttributes="true" />
+    <property name="version_name" value="${mymanifest.manifest.android:versionName}" />
+    <property name="version_code" value="${mymanifest.manifest.android:versionCode}" />
+
+    <tstamp><format property="TODAY_CN" pattern="yyyy-MM-dd" locale="zh"/></tstamp>
+    <tstamp><format property="TIME_CN" pattern="yyyy-MM-dd-HH-mm-ss" locale="zh"/></tstamp>
+    <tstamp><format property="RELEASE_TIME" pattern="yyyy-MM-dd HH-mm-ss" locale="zh"/></tstamp>
+
+    <property name="apkname" value="${ant.project.name}_release_${TIME_CN}_${mymanifest.manifest.android:versionName}.apk" />
+    <target name="deploy">
+        <property name="out.final.file" location="${release_dir}/${apkname}" />
+        <delete dir="${release_dir}" />
+        <mkdir dir="${release_dir}"/>
+        <antcall target="clean" />
+        <antcall target="release" />
+    </target>
+</project>
