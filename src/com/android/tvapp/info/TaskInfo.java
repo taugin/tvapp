@@ -1,16 +1,18 @@
 package com.android.tvapp.info;
 
 public class TaskInfo {
+    public String id;
     public String ip;
     public String name;
     public String type;
+    public String interval;
     public String audiourl;
     public String videourl;
     public String texturl;
     public String content;
     public String time;
     public String []imgurl;
-    
+
     public String toString() {
         String out = "";
         out += "ip       : " + ip + "\n";

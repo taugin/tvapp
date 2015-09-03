@@ -27,7 +27,6 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tvapp_showaudio, null);
         mViewFlipper = (CustomViewFlipper) view.findViewById(R.id.viewflipper);
-        mViewFlipper.setFlipInterval(5000);
         mViewFlipper.setOnClickListener(this);
         return view;
     }
@@ -68,6 +67,15 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
     private void start() {
         Log.d(Log.TAG, "");
         if (mViewFlipper != null) {
+            int interval = 0;
+            try {
+                interval = Integer.parseInt(mTaskInfo.interval);
+                interval *= 1000;
+            } catch(NumberFormatException e) {
+                interval = 10 * 1000;
+            }
+            Log.d(Log.TAG, "interval : " + interval);
+            mViewFlipper.setFlipInterval(interval);
             addBgImage();
             mViewFlipper.startFlipping();
             Log.d(Log.TAG, "View Count : " + mViewFlipper.getChildCount());

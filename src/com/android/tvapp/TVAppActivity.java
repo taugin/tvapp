@@ -27,11 +27,14 @@ import com.android.tvapp.util.Log;
 import com.android.tvapp.util.Utils;
 
 public class TVAppActivity extends FragmentActivity implements OnTaskRequestCompletedListener {
+    private static final long REQUEST_INTERVAL = 5 * 60 * 1000;
     private HashMap<String, BaseFragment> mHashMap;
     private List<TaskInfo> mTaskList;
+    private List<TaskInfo> mPreparedList;
     private TextView mEmptyView;
     private int mCurrentIndex = 0;
     private Handler mHandler;
+    private int mRequestCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,11 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     }
 
     private void requestTaskList() {
+        mRequestCount++;
+        if (mRequestCount > Integer.MAX_VALUE) {
+            mRequestCount = 0;
+        }
+        // Log.d(Log.TAG, "Request TaskList " + mRequestCount + " times");
         TaskRequest taskRequest = new TaskRequest(this);
         taskRequest.setOnTaskRequestCompletedListener(this);
         taskRequest.requestTaskInfo();
@@ -61,13 +69,15 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     @Override
     public void onTaskRequestCompleted(List<TaskInfo> list) {
         if (list != null) {
-            mTaskList = list;
-        } else {
-            Log.d(Log.TAG, "Request TaskList Failure");
-        }
-        if (mTaskList != null) {
-            showFragment();
-        } else {
+            if (mTaskList == null || mTaskList.size() <= 0) {
+                Log.d(Log.TAG, "First Request, showFragment");
+                mTaskList = list;
+                showFragment();
+            } else {
+                Log.d(Log.TAG, "PreparedList is ready");
+                mPreparedList = list;
+            }
+        } else if (mTaskList == null || mTaskList.size() <= 0){
             Log.d(Log.TAG, "TaskList is Empty");
             mHandler.post(new Runnable() {
                 @Override
@@ -76,12 +86,14 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                 }
             });
         }
+        mHandler.postDelayed(mRequestTaskRunnable, REQUEST_INTERVAL);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregister();
+        mHandler.removeCallbacks(mRequestTaskRunnable);
     }
 
     private void register() {
@@ -125,6 +137,13 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         });
     }
 
+    private Runnable mRequestTaskRunnable = new Runnable() {
+        @Override
+        public void run() {
+            requestTaskList();
+        }
+    };
+
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -136,7 +155,12 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                 mCurrentIndex ++;
                 if (mTaskList != null && mCurrentIndex >= mTaskList.size()) {
                     mCurrentIndex = 0;
-                    requestTaskList();
+                    if (mPreparedList != null && mPreparedList.size() > 0) {
+                        Log.d(Log.TAG, "The Previouse TaskList has completed, Use PreparedList");
+                        mTaskList = mPreparedList;
+                    } else {
+                        Log.d(Log.TAG, "The Previouse TaskList has completed, Continue to execute");
+                    }
                 }
                 showFragment();
             } else if (Utils.FINISH_ACTIVITY.equals(intent.getAction())) {
