@@ -103,7 +103,7 @@ public class AudoPlayHelper implements OnBufferingUpdateListener,
     public void setLooping(boolean looping) {
         mediaPlayer.setLooping(looping);
     }
-    
+
     public void pause() {
         mediaPlayer.pause();
     }
@@ -142,7 +142,8 @@ public class AudoPlayHelper implements OnBufferingUpdateListener,
     }
 
     @Override
-    public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+    public boolean onError(MediaPlayer mediaPlayer, int what, int extra) {
+        Log.d(Log.TAG, "extra : " + extra);
         if (mOnCompleteListener != null) {
             mOnCompleteListener.onComplete();
         }

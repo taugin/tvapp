@@ -9,6 +9,14 @@ import org.apache.http.conn.util.InetAddressUtils;
 
 public class Utils {
 
+    public static final boolean USE_TEST_MODE = false;
+    public static final String TASK_COMPLETE = "com.android.tvapp.intent.action.TASK_COMPLETE";
+    public static final String FINISH_ACTIVITY = "com.android.tvapp.intent.action.FINISH_ACTIVITY";
+    public static final String NONEW_VERSION = "com.android.tvapp.intent.action.NONEW_VERSION";
+    
+    public static final String UPGRADE_URL = "http://218.92.26.6:8000/multimedia/upload/version/update.json";
+    public static final String TASKLIST_URL = "http://218.92.26.6:8000/multimedia/upload/config/task.json";
+
     public static String getIpAddress() {
         String ipaddress = "";
         try {
@@ -34,6 +42,4 @@ public class Utils {
         }
         return ipaddress;
     }
-
-    public static final String TASK_COMPLETE = "com.android.tvapp.intent.action.TASK_COMPLETE";
 }

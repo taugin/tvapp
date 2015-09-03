@@ -8,7 +8,6 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ import com.android.tvapp.R;
 import com.android.tvapp.util.Log;
 import com.android.tvapp.util.Utils;
 
-public class VideoFragment extends Fragment implements OnCompletionListener, OnErrorListener, OnPreparedListener {
+public class VideoFragment extends BaseFragment implements OnCompletionListener, OnErrorListener, OnPreparedListener {
 
     private VideoView mVideoView;
     private View mProgressBar;
@@ -51,7 +50,9 @@ public class VideoFragment extends Fragment implements OnCompletionListener, OnE
         Uri uri2 = Uri.parse("file:///storage/emulated/0/≤‚ ‘ ”∆µ_3.mp4");
         Uri uri3 = Uri.parse("http://forum.ea3w.com/coll_ea3w/attach/2008_10/12237832415.3gp");
         Uri uri4 = Uri.parse("http://www.androidbook.com/akc/filestorage/android/documentfiles/3389/movie.mp4");
-        mVideoView.setVideoURI(uri3);
+        Log.d(Log.TAG, "videourl : " + mTaskInfo.videourl);
+        Uri videoUri = Uri.parse(mTaskInfo.videourl);
+        mVideoView.setVideoURI(videoUri);
         mVideoView.requestFocus();
         mVideoView.start();
         mProgressBar.setVisibility(View.VISIBLE);

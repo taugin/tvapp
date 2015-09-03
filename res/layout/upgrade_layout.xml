@@ -23,11 +23,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="@string/instruction"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:visibility="gone"/>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="100dp" >
+        android:layout_height="100dp"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/version_instruction"

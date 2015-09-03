@@ -6,6 +6,7 @@ public class TaskInfo {
     public String type;
     public String audiourl;
     public String videourl;
+    public String texturl;
     public String content;
     public String time;
     public String []imgurl;
@@ -17,6 +18,7 @@ public class TaskInfo {
         out += "type     : " + type + "\n";
         out += "audiourl : " + audiourl + "\n";
         out += "videourl : " + videourl + "\n";
+        out += "texturl  : " + texturl + "\n";
         out += "content  : " + content + "\n";
         out += "time     : " + time + "\n";
         if (imgurl != null) {

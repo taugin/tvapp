@@ -1,13 +1,13 @@
-package com.android.tvapp.upgrade;
+package com.android.tvapp.manager;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
+import java.net.URLConnection;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
@@ -31,12 +32,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tvapp.R;
+import com.android.tvapp.info.UpgradeInfo;
 import com.android.tvapp.util.Log;
+import com.android.tvapp.util.Utils;
 import com.google.gson.Gson;
 
 public class UpgradeManager implements Runnable, OnClickListener {
-
-    private static final String CONFIG_PATH = "https://raw.githubusercontent.com/taugin/versionrelease/master/phoneassistant/config.json";
 
     private static final int ACTION_FETCH_CONFIG = 0;
     private static final int ACTION_DOWNLOAD = 1;
@@ -68,11 +69,28 @@ public class UpgradeManager implements Runnable, OnClickListener {
         init();
     }
 
-    public String getUpgradeConfig() {
+    private String getTestConfig() {
         try {
-            URL url = new URL(CONFIG_PATH);
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-            conn.setConnectTimeout(10000);
+            InputStream is = mContext.getAssets().open("upgrade.json");
+            byte[] buffer = new byte[1024];
+            int read = 0;
+            StringBuilder builder = new StringBuilder();
+            while((read = is.read(buffer)) > 0) {
+                builder.append(new String(buffer, 0, read));
+            }
+            is.close();
+            return builder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String getUpgradeConfig() {
+        try {
+            URL url = new URL(Utils.UPGRADE_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(100000);
             conn.connect();
             InputStream inStream = conn.getInputStream();
             byte buf[] = new byte[1024];
@@ -82,7 +100,7 @@ public class UpgradeManager implements Runnable, OnClickListener {
                 builder.append(new String(buf, 0, read));
             }
             inStream.close();
-            Log.d(Log.TAG, "config = \n" + builder.toString());
+            // Log.d(Log.TAG, "config = \n" + builder.toString());
             return builder.toString();
         } catch (MalformedURLException e) {
             Log.d(Log.TAG, "error : " + e);
@@ -96,16 +114,12 @@ public class UpgradeManager implements Runnable, OnClickListener {
         Message msg = null;
         try {
             URL url = new URL(apkUrl);
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
+            URLConnection conn = (URLConnection) url.openConnection();
+            //conn.setDoInput(true);
+            //conn.setDoOutput(true);
             Log.d(Log.TAG, "setTimeout");
             conn.setConnectTimeout(10000);
             conn.connect();
-            Log.d(Log.TAG, "conn.getResponseCode() = " + conn.getResponseCode());
-            if (conn.getResponseCode() != 200) {
-                return null;
-            }
             long fileLen = 0;
             String length = conn.getHeaderField("Content-Length");
             if (TextUtils.isDigitsOnly(length)) {
@@ -176,9 +190,16 @@ public class UpgradeManager implements Runnable, OnClickListener {
     }
 
     private void upgradeCheck() {
-        String config = getUpgradeConfig();
+        String config = null;
+        if (Utils.USE_TEST_MODE) {
+            config = getTestConfig();
+        } else {
+            config = getUpgradeConfig();
+        }
         mHandler.sendEmptyMessage(MSG_DISMISS_PROGRESS_DIALOG);
         if (TextUtils.isEmpty(config)) {
+            Intent intent = new Intent(Utils.NONEW_VERSION);
+            mContext.sendBroadcast(intent);
             return;
         }
         Gson gson = new Gson();
@@ -186,8 +207,17 @@ public class UpgradeManager implements Runnable, OnClickListener {
         mUpgradeInfo = info;
         Log.d(Log.TAG, info.toString());
         int versionCode = getAppVer();
-        if (versionCode >= info.version_code) {
-            mHandler.sendEmptyMessage(MSG_SHOW_TOAST);
+        int lastestVersion = 0;
+        try {
+            lastestVersion = Integer.parseInt(info.versioncode);
+        } catch(NumberFormatException e) {
+            Log.d(Log.TAG, "error : " + e);
+        }
+        Log.d(Log.TAG, "lastestVersion : " + lastestVersion + " , versionCode : " + versionCode);
+        if (versionCode >= lastestVersion) {
+            // mHandler.sendEmptyMessage(MSG_SHOW_TOAST);
+            Intent intent = new Intent(Utils.NONEW_VERSION);
+            mContext.sendBroadcast(intent);
             return;
         }
         mHandler.sendEmptyMessage(MSG_SHOW_NEWVERSION_DIALOG);
@@ -214,10 +244,10 @@ public class UpgradeManager implements Runnable, OnClickListener {
             mCancel = (Button) view.findViewById(R.id.cancel);
             mCancel.setOnClickListener(this);
             TextView versionView = (TextView) view.findViewById(R.id.version_name);
-            String versionName = mContext.getResources().getString(R.string.version_name, mUpgradeInfo.version_name);
+            String versionName = mContext.getResources().getString(R.string.version_name, mUpgradeInfo.versionname);
             versionView.setText(versionName);
             TextView releaseView = (TextView) view.findViewById(R.id.release_time);
-            String releaseTime = mContext.getResources().getString(R.string.release_time, mUpgradeInfo.release_time);
+            String releaseTime = mContext.getResources().getString(R.string.release_time, mUpgradeInfo.releasetime);
             releaseView.setText(releaseTime);
             if (TextUtils.isEmpty(mUpgradeInfo.instructions)) {
                 mUpgradeInfo.instructions = mContext.getResources().getString(R.string.empty_instructions);
@@ -253,11 +283,13 @@ public class UpgradeManager implements Runnable, OnClickListener {
         if (ACTION_FETCH_CONFIG == mAction) {
             upgradeCheck();
         } else {
-            String apkPath = download(mUpgradeInfo.app_url,
-                    mUpgradeInfo.app_name);
+            String apkPath = download(mUpgradeInfo.downloadurl,
+                    mUpgradeInfo.apkname);
             mHandler.sendEmptyMessage(MSG_DISMISS_ALERTDIALOG);
             if (!TextUtils.isEmpty(apkPath)) {
                 openFile(new File(apkPath));
+                Intent intent = new Intent(Utils.FINISH_ACTIVITY);
+                mContext.sendBroadcast(intent);
             }
         }
     }
@@ -307,6 +339,7 @@ public class UpgradeManager implements Runnable, OnClickListener {
                     Long integer = (Long) msg.obj;
                     mProgressBar.setMax(integer.intValue());
                     mProgressLayout.setVisibility(View.VISIBLE);
+                    mDownloadSize.setTextColor(Color.WHITE);
                 }
                     break;
                 case MSG_UPDATE_PROGRESS_BAR: {
@@ -342,6 +375,8 @@ public class UpgradeManager implements Runnable, OnClickListener {
             if (mAlertDialog != null && mAlertDialog.isShowing()) {
                 mAlertDialog.dismiss();
                 mAlertDialog = null;
+                Intent intent = new Intent(Utils.FINISH_ACTIVITY);
+                mContext.sendBroadcast(intent);
             }
             break;
         }

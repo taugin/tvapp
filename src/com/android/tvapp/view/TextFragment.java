@@ -3,7 +3,6 @@ package com.android.tvapp.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,7 @@ import com.android.tvapp.R;
 import com.android.tvapp.util.Log;
 import com.android.tvapp.util.Utils;
 
-public class TextFragment extends Fragment {
+public class TextFragment extends BaseFragment {
 
     private WebView mWebView;
     private Handler mHandler;
@@ -47,9 +46,18 @@ public class TextFragment extends Fragment {
         String ipAddress = Utils.getIpAddress();
         String showText = "";
         showText += "IpAddress : " + ipAddress;
-        mWebView.loadUrl("file:///android_asset/index/index.html");
+        Log.d(Log.TAG, "texturl : " + mTaskInfo.texturl);
+        mWebView.loadUrl(mTaskInfo.texturl);
         // mWebView.loadData(showText, "text/html", "utf-8");
-        mHandler.postDelayed(mRunnable, 10 * 1000);
+        long time = 0;
+        try {
+            time = Long.parseLong(mTaskInfo.time);
+            time = time * 1000;
+        } catch(NumberFormatException e) {
+            time = 10 * 1000;
+        }
+        Log.d(Log.TAG, "time : " + time);
+        mHandler.postDelayed(mRunnable, time);
     }
 
     private WebViewClient mWebViewClient = new WebViewClient() {

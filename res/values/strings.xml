@@ -11,8 +11,8 @@
     <string name="upgrade_button">升级</string>
     <string name="connecting">正在连接 &#8230;</string>
     <string name="get_upgradeinfo">正在获取更新信息&#8230;</string>
-    
-    <string name="no_newversion_tip">Your version is lastest !</string>
-    <string name="new_version_tiptitle">New Version</string>
-    <string name="loading">Loading &#8230;</string>
+    <string name="no_newversion_tip">您的版本是已最新的啦</string>
+    <string name="new_version_tiptitle">新版本更新</string>
+    <string name="loading">加载中 &#8230;</string>
+    <string name="empty_list">无法获取任务列表，可能网络或其他的原因，请检查</string>
 </resources>
