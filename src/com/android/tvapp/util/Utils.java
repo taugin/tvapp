@@ -9,7 +9,7 @@ import org.apache.http.conn.util.InetAddressUtils;
 
 public class Utils {
 
-    public static final boolean USE_TEST_MODE = false;
+    public static final boolean USE_TEST_MODE = true;
     public static final String TASK_COMPLETE = "com.android.tvapp.intent.action.TASK_COMPLETE";
     public static final String FINISH_ACTIVITY = "com.android.tvapp.intent.action.FINISH_ACTIVITY";
     public static final String NONEW_VERSION = "com.android.tvapp.intent.action.NONEW_VERSION";

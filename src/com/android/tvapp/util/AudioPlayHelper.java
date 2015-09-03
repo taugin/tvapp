@@ -1,77 +1,33 @@
 package com.android.tvapp.util;
 
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
-import android.os.Handler;
-import android.os.Message;
-import android.widget.SeekBar;
 
-import com.android.tvapp.view.OnCompleteListener;
+import com.android.tvapp.fragment.OnCompleteListener;
 
-public class AudoPlayHelper implements OnBufferingUpdateListener,
-        OnCompletionListener, MediaPlayer.OnPreparedListener, OnErrorListener {
+public class AudioPlayHelper implements OnCompletionListener, MediaPlayer.OnPreparedListener, OnErrorListener {
     public MediaPlayer mediaPlayer;
-    private SeekBar mSeekBar;
     private OnCompleteListener mOnCompleteListener;
-    private Timer mTimer = new Timer();
 
-    public AudoPlayHelper(SeekBar skbProgress) {
-        mSeekBar = skbProgress;
-
+    public AudioPlayHelper() {
         try {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setOnBufferingUpdateListener(this);
             mediaPlayer.setOnPreparedListener(this);
             mediaPlayer.setOnCompletionListener(this);
             mediaPlayer.setOnErrorListener(this);
         } catch (Exception e) {
              Log.e(Log.TAG, "error : " + e);
         }
-
-        mTimer.schedule(mTimerTask, 0, 1000);
     }
 
     public void setOnCompleteListener(OnCompleteListener l) {
         mOnCompleteListener = l;
     }
-    /*******************************************************
-     * 通过定时器和Handler来更新进度条
-     ******************************************************/
-    TimerTask mTimerTask = new TimerTask() {
-        @Override
-        public void run() {
-            if (mediaPlayer == null)
-                return;
-            if (mediaPlayer.isPlaying() && mSeekBar.isPressed() == false) {
-                handleProgress.sendEmptyMessage(0);
-            }
-        }
-    };
-
-    Handler handleProgress = new Handler() {
-        public void handleMessage(Message msg) {
-            if (mediaPlayer == null) {
-                return;
-            }
-            int position = mediaPlayer.getCurrentPosition();
-            int duration = mediaPlayer.getDuration();
-
-            if (duration > 0) {
-                long pos = mSeekBar.getMax() * position / duration;
-                mSeekBar.setProgress((int) pos);
-            }
-        };
-    };
-
-    // *****************************************************
 
     public void play() {
         mediaPlayer.start();
@@ -131,14 +87,6 @@ public class AudoPlayHelper implements OnBufferingUpdateListener,
         if (mOnCompleteListener != null) {
             mOnCompleteListener.onComplete();
         }
-    }
-
-    @Override
-    public void onBufferingUpdate(MediaPlayer mediaPlayer, int bufferingProgress) {
-        mSeekBar.setSecondaryProgress(bufferingProgress);
-        int currentProgress = mSeekBar.getMax()
-                * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration();
-        Log.e(currentProgress + "% play", bufferingProgress + "% buffer");
     }
 
     @Override

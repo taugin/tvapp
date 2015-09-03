@@ -1,4 +1,4 @@
-package com.android.tvapp.view;
+package com.android.tvapp.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,27 +7,27 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.ViewFlipper;
+import android.widget.ImageView.ScaleType;
 
 import com.android.tvapp.R;
-import com.android.tvapp.info.TaskInfo;
-import com.android.tvapp.util.AudoPlayHelper;
+import com.android.tvapp.util.AudioPlayHelper;
 import com.android.tvapp.util.Log;
 import com.android.tvapp.util.Utils;
 import com.android.tvapp.util.VolleyImageLoader;
+import com.android.tvapp.view.CustomViewFlipper;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
 
 public class AudioFragment extends BaseFragment implements OnCompleteListener, OnClickListener {
 
-    private ViewFlipper mViewFlipper;
-    private AudoPlayHelper mAudoPlayHelper;
+    private CustomViewFlipper mViewFlipper;
+    private AudioPlayHelper mAudoPlayHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tvapp_showaudio, null);
-        mViewFlipper = (ViewFlipper) view.findViewById(R.id.viewflipper);
+        mViewFlipper = (CustomViewFlipper) view.findViewById(R.id.viewflipper);
+        mViewFlipper.setFlipInterval(5000);
         mViewFlipper.setOnClickListener(this);
         return view;
     }
@@ -50,13 +50,13 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
         }
     }
 
-
     private void addBgImage() {
         mViewFlipper.removeAllViews();
         ImageView imageView = null;
         for (String url : mTaskInfo.imgurl) {
             Log.d(Log.TAG, "imgurl : " + url);
             imageView = new ImageView(getActivity());
+            imageView.setScaleType(ScaleType.FIT_CENTER);
             VolleyImageLoader loader = VolleyImageLoader.getVolleyImageLoader(getActivity());
             ImageListener imageListener = VolleyImageLoader.getImageListener(imageView, 0);
             imageView.setTag(VolleyImageLoader.encodeUrl(url));
@@ -75,8 +75,7 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
 
         String musicUrl = mTaskInfo.audiourl;
         Log.d(Log.TAG, "audiourl : " + musicUrl);
-        SeekBar seekBar = new SeekBar(getActivity());
-        mAudoPlayHelper = new AudoPlayHelper(seekBar);
+        mAudoPlayHelper = new AudioPlayHelper();
         mAudoPlayHelper.setOnCompleteListener(this);
         mAudoPlayHelper.playUrl(musicUrl);
         Log.d(Log.TAG, "after playurl");

@@ -1,0 +1,23 @@
+[{
+    "ip": "192.168.5.22",
+    "name": "会议室",
+    "type": "audio",
+    "audiourl": "http://yinyueshiting.baidu.com/data2/music/87718279/1262598144114126164.mp3?xcode=d129d3372a37bbea35dc224202a6daff",
+    "imgurl": ["http://f.hiphotos.baidu.com/image/pic/item/ac4bd11373f082022707d43e49fbfbedab641b1d.jpg",
+               "http://c.hiphotos.baidu.com/image/pic/item/a044ad345982b2b73ae68fc533adcbef76099bb2.jpg",
+               "http://g.hiphotos.baidu.com/image/pic/item/6609c93d70cf3bc7910a48edd300baa1cd112aac.jpg",
+               "http://a.hiphotos.baidu.com/image/pic/item/7c1ed21b0ef41bd5353de6f353da81cb39db3d4e.jpg"]
+},
+{
+    "ip": "192.168.5.22",
+    "name": "会议室",
+    "type": "video",
+    "videourl": "http://forum.ea3w.com/coll_ea3w/attach/2008_10/12237832415.3gp"
+},
+{
+    "ip": "192.168.5.20",
+    "type": "text",
+    "name": "会议室",
+    "texturl":"http://218.92.26.6:8000/multimedia/upload/doc/index1.html",
+    "time": "30"
+}]

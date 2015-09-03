@@ -15,16 +15,16 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.tvapp.fragment.AudioFragment;
+import com.android.tvapp.fragment.BaseFragment;
+import com.android.tvapp.fragment.TextFragment;
+import com.android.tvapp.fragment.VideoFragment;
 import com.android.tvapp.info.TaskInfo;
 import com.android.tvapp.manager.TaskRequest;
 import com.android.tvapp.manager.TaskRequest.OnTaskRequestCompletedListener;
 import com.android.tvapp.manager.UpgradeManager;
 import com.android.tvapp.util.Log;
 import com.android.tvapp.util.Utils;
-import com.android.tvapp.view.AudioFragment;
-import com.android.tvapp.view.BaseFragment;
-import com.android.tvapp.view.TextFragment;
-import com.android.tvapp.view.VideoFragment;
 
 public class TVAppActivity extends FragmentActivity implements OnTaskRequestCompletedListener {
     private HashMap<String, BaseFragment> mHashMap;

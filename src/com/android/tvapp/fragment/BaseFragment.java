@@ -1,4 +1,4 @@
-package com.android.tvapp.view;
+package com.android.tvapp.fragment;
 
 import android.support.v4.app.Fragment;
 

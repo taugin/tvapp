@@ -1,8 +1,8 @@
 package com.android.tvapp;
 
-import com.android.tvapp.util.VolleyImageLoader;
-
 import android.app.Application;
+
+import com.android.tvapp.util.VolleyImageLoader;
 
 public class TVApp extends Application {
 

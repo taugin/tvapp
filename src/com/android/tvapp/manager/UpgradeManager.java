@@ -90,7 +90,7 @@ public class UpgradeManager implements Runnable, OnClickListener {
         try {
             URL url = new URL(Utils.UPGRADE_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(100000);
+            conn.setConnectTimeout(30000);
             conn.connect();
             InputStream inStream = conn.getInputStream();
             byte buf[] = new byte[1024];

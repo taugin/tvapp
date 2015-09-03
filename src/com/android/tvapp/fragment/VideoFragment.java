@@ -1,4 +1,4 @@
-package com.android.tvapp.view;
+package com.android.tvapp.fragment;
 
 import android.content.Intent;
 import android.media.MediaPlayer;

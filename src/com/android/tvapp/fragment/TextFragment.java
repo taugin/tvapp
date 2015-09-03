@@ -1,4 +1,4 @@
-package com.android.tvapp.view;
+package com.android.tvapp.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -61,10 +61,14 @@ public class TextFragment extends BaseFragment {
     }
 
     private WebViewClient mWebViewClient = new WebViewClient() {
-
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            return false;
+            return true;
+        }
+        @Override
+        public void onReceivedError(WebView view, int errorCode,
+                String description, String failingUrl) {
+            Log.d(Log.TAG, "errorCode : " + errorCode + " , description : " + description);
         }
     };
 
