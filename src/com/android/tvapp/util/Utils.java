@@ -13,9 +13,12 @@ public class Utils {
     public static final String TASK_COMPLETE = "com.android.tvapp.intent.action.TASK_COMPLETE";
     public static final String FINISH_ACTIVITY = "com.android.tvapp.intent.action.FINISH_ACTIVITY";
     public static final String NONEW_VERSION = "com.android.tvapp.intent.action.NONEW_VERSION";
-    
-    public static final String UPGRADE_URL = "http://218.92.26.6:8000/multimedia/upload/version/update.json";
-    public static final String TASKLIST_URL = "http://218.92.26.6:8000/multimedia/upload/config/task.json";
+
+    private static final String INTERNET_URL = "http://218.92.26.6:8000/";
+    private static final String LAN_URL = "http://192.168.5.254:8080/";
+    private static final String HOST_URL = LAN_URL;
+    public static final String UPGRADE_URL = HOST_URL + "multimedia/upload/version/update.json";
+    public static final String TASKLIST_URL = HOST_URL + "multimedia/upload/config/task.json";
 
     public static String getIpAddress() {
         String ipaddress = "";
