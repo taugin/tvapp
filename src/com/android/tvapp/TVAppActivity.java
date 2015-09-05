@@ -11,8 +11,6 @@ import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
-import android.view.View;
-import android.widget.TextView;
 
 import com.android.tvapp.fragment.AudioFragment;
 import com.android.tvapp.fragment.BaseFragment;
@@ -30,7 +28,6 @@ import com.android.tvapp.util.Utils;
 public class TVAppActivity extends FragmentActivity implements OnTaskRequestCompletedListener, OnPollRequestCompletedListener {
     private static final long REQUEST_INTERVAL = 10 * 1000;
     private List<TaskInfo> mTaskList;
-    private TextView mEmptyView;
     private int mCurrentIndex = 0;
     private Handler mHandler;
     private long mRequestCount = 0;
@@ -43,7 +40,6 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         super.onCreate(savedInstanceState);
         register();
         setContentView(R.layout.activity_tvapp);
-        mEmptyView = (TextView) findViewById(R.id.empty_view);
         mHandler = new Handler();
         mPollRequest = new PollRequest(this);
         mPollRequest.setOnPollRequestCompletedListener(this);
@@ -68,14 +64,6 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
             Log.d(Log.TAG, "Request Success, showFragment");
             mTaskList = list;
             showFragment();
-        } else {
-            Log.d(Log.TAG, "TaskList is Empty");
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mEmptyView.setVisibility(View.VISIBLE);
-                }
-            });
         }
     }
 
@@ -94,13 +82,6 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         if (taskId != null && !taskId.equals(mCurrentTaskId)) {
             Log.d(Log.TAG, "");
             requestTaskList();
-        } else {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mEmptyView.setVisibility(View.VISIBLE);
-                }
-            });
         }
         mCurrentTaskId = taskId;
         mHandler.postDelayed(mRequestPollRunnable, REQUEST_INTERVAL);
@@ -144,7 +125,6 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                                 .beginTransaction();
                         transaction.replace(R.id.fragment_layout, fragment);
                         transaction.commitAllowingStateLoss();
-                        mEmptyView.setVisibility(View.INVISIBLE);
                     }
                 } catch(Exception e) {
                     Log.d(Log.TAG, "error : " + e);
