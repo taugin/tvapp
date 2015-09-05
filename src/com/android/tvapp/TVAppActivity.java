@@ -1,6 +1,5 @@
 package com.android.tvapp;
 
-import java.util.HashMap;
 import java.util.List;
 
 import android.content.BroadcastReceiver;
@@ -20,21 +19,24 @@ import com.android.tvapp.fragment.BaseFragment;
 import com.android.tvapp.fragment.TextFragment;
 import com.android.tvapp.fragment.VideoFragment;
 import com.android.tvapp.info.TaskInfo;
+import com.android.tvapp.manager.PollRequest;
+import com.android.tvapp.manager.PollRequest.OnPollRequestCompletedListener;
 import com.android.tvapp.manager.TaskRequest;
 import com.android.tvapp.manager.TaskRequest.OnTaskRequestCompletedListener;
 import com.android.tvapp.manager.UpgradeManager;
 import com.android.tvapp.util.Log;
 import com.android.tvapp.util.Utils;
 
-public class TVAppActivity extends FragmentActivity implements OnTaskRequestCompletedListener {
-    private static final long REQUEST_INTERVAL = 5 * 60 * 1000;
-    private HashMap<String, BaseFragment> mHashMap;
+public class TVAppActivity extends FragmentActivity implements OnTaskRequestCompletedListener, OnPollRequestCompletedListener {
+    private static final long REQUEST_INTERVAL = 10 * 1000;
     private List<TaskInfo> mTaskList;
-    private List<TaskInfo> mPreparedList;
     private TextView mEmptyView;
     private int mCurrentIndex = 0;
     private Handler mHandler;
-    private int mRequestCount = 0;
+    private long mRequestCount = 0;
+    private PollRequest mPollRequest;
+    private TaskRequest mTaskRequest;
+    private String mCurrentTaskId = "noset";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +44,11 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         register();
         setContentView(R.layout.activity_tvapp);
         mEmptyView = (TextView) findViewById(R.id.empty_view);
-        mHashMap = new HashMap<String, BaseFragment>();
-        mHashMap.put("text", new TextFragment());
-        mHashMap.put("audio", new AudioFragment());
-        mHashMap.put("video", new VideoFragment());
         mHandler = new Handler();
+        mPollRequest = new PollRequest(this);
+        mPollRequest.setOnPollRequestCompletedListener(this);
+        mTaskRequest = new TaskRequest(this);
+        mTaskRequest.setOnTaskRequestCompletedListener(this);
         newVersionCheck();
     }
 
@@ -56,28 +58,17 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     }
 
     private void requestTaskList() {
-        mRequestCount++;
-        if (mRequestCount > Integer.MAX_VALUE) {
-            mRequestCount = 0;
-        }
         // Log.d(Log.TAG, "Request TaskList " + mRequestCount + " times");
-        TaskRequest taskRequest = new TaskRequest(this);
-        taskRequest.setOnTaskRequestCompletedListener(this);
-        taskRequest.requestTaskInfo();
+        mTaskRequest.requestTaskInfo();
     }
 
     @Override
     public void onTaskRequestCompleted(List<TaskInfo> list) {
         if (list != null) {
-            if (mTaskList == null || mTaskList.size() <= 0) {
-                Log.d(Log.TAG, "First Request, showFragment");
-                mTaskList = list;
-                showFragment();
-            } else {
-                Log.d(Log.TAG, "PreparedList is ready");
-                mPreparedList = list;
-            }
-        } else if (mTaskList == null || mTaskList.size() <= 0){
+            Log.d(Log.TAG, "Request Success, showFragment");
+            mTaskList = list;
+            showFragment();
+        } else {
             Log.d(Log.TAG, "TaskList is Empty");
             mHandler.post(new Runnable() {
                 @Override
@@ -86,14 +77,40 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                 }
             });
         }
-        mHandler.postDelayed(mRequestTaskRunnable, REQUEST_INTERVAL);
+    }
+
+    private void requestPoll() {
+        mRequestCount++;
+        if (mRequestCount > Long.MAX_VALUE) {
+            mRequestCount = 0;
+        }
+        // Log.d(Log.TAG, "mRequestCount : " + mRequestCount);
+        mPollRequest.requestPollInfo();
+    }
+
+    @Override
+    public void onPollRequestCompleted(String taskId) {
+        // Log.d(Log.TAG, "taskId = " + taskId);
+        if (taskId != null && !taskId.equals(mCurrentTaskId)) {
+            Log.d(Log.TAG, "");
+            requestTaskList();
+        } else {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mEmptyView.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        mCurrentTaskId = taskId;
+        mHandler.postDelayed(mRequestPollRunnable, REQUEST_INTERVAL);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregister();
-        mHandler.removeCallbacks(mRequestTaskRunnable);
+        mHandler.removeCallbacks(mRequestPollRunnable);
     }
 
     private void register() {
@@ -118,9 +135,8 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                 BaseFragment fragment = null;
                 TaskInfo taskInfo = mTaskList.get(mCurrentIndex);
                 if (taskInfo != null && !TextUtils.isEmpty(taskInfo.type)) {
-                    fragment = mHashMap.get(taskInfo.type);
+                    fragment = createFragment(taskInfo.type);
                 }
-                Log.d(Log.TAG, "mCurrentIndex : " + mCurrentIndex + " , fragment : " + fragment);
                 try {
                     if (fragment != null) {
                         fragment.setTaskInfo(taskInfo);
@@ -137,10 +153,10 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         });
     }
 
-    private Runnable mRequestTaskRunnable = new Runnable() {
+    private Runnable mRequestPollRunnable = new Runnable() {
         @Override
         public void run() {
-            requestTaskList();
+            requestPoll();
         }
     };
 
@@ -155,19 +171,26 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                 mCurrentIndex ++;
                 if (mTaskList != null && mCurrentIndex >= mTaskList.size()) {
                     mCurrentIndex = 0;
-                    if (mPreparedList != null && mPreparedList.size() > 0) {
-                        Log.d(Log.TAG, "The Previouse TaskList has completed, Use PreparedList");
-                        mTaskList = mPreparedList;
-                    } else {
-                        Log.d(Log.TAG, "The Previouse TaskList has completed, Continue to execute");
-                    }
                 }
                 showFragment();
             } else if (Utils.FINISH_ACTIVITY.equals(intent.getAction())) {
                 finish();
             } else if (Utils.NONEW_VERSION.equals(intent.getAction())) {
-                requestTaskList();
+                mHandler.post(mRequestPollRunnable);
             }
         }
     };
+
+    private BaseFragment createFragment(String type) {
+        if (!TextUtils.isEmpty(type)) {
+            if (type.equals("text")) {
+                return new TextFragment();
+            } else if (type.equals("audio")) {
+                return new AudioFragment();
+            } else if (type.equals("video")) {
+                return new VideoFragment();
+            }
+        }
+        return null;
+    }
 }

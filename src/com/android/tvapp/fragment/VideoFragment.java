@@ -52,6 +52,7 @@ public class VideoFragment extends BaseFragment implements OnCompletionListener,
         Uri uri4 = Uri.parse("http://www.androidbook.com/akc/filestorage/android/documentfiles/3389/movie.mp4");
         Log.d(Log.TAG, "videourl : " + mTaskInfo.videourl);
         Uri videoUri = Uri.parse(mTaskInfo.videourl);
+        mVideoView.stopPlayback();
         mVideoView.setVideoURI(videoUri);
         mVideoView.requestFocus();
         mVideoView.start();

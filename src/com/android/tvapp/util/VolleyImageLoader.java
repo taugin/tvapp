@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URLEncoder;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
@@ -63,13 +64,33 @@ public class VolleyImageLoader extends ImageLoader {
             public void onResponse(ImageContainer response, boolean isImmediate) {
                 if (response.getBitmap() != null) {
                     if (view.getTag() != null && view.getTag().equals(response.getRequestUrl())) {
-                        view.setImageBitmap(response.getBitmap());
+                        view.setImageBitmap(scaledBitmap(response.getBitmap()));
                     }
                 } else if (defaultImageResId != 0) {
                     view.setImageResource(defaultImageResId);
                 }
             }
         };
+    }
+
+    private static Bitmap scaledBitmap(Bitmap srcBmp) {
+        if (srcBmp != null) {
+            int w = srcBmp.getWidth();
+            int h = srcBmp.getHeight();
+            Log.d(Log.TAG, "w : " + w + " , h : " + h);
+            int newW = w;
+            int newH = h;
+            if (w > 4096) {
+                newW = 4096;
+            }
+            if (h > 4096) {
+                newH = 4096;
+            }
+            Bitmap dstBmp = Bitmap.createScaledBitmap(srcBmp, newW, newH, false);
+            srcBmp.recycle();
+            return dstBmp;
+        }
+        return null;
     }
 
     public static String encodeUrl(String url) {

@@ -43,7 +43,9 @@ public class TaskRequest implements Listener<String>, ErrorListener {
     }
 
     private void requestTaskList() {
-        StringRequest request = new StringRequest(Utils.TASKLIST_URL, this, this){
+        String url = Utils.genParamUrl(Utils.URL_TASKLIST);
+        Log.d(Log.TAG, "url : " + url);
+        StringRequest request = new StringRequest(url, this, this){
             @Override
             protected Response<String> parseNetworkResponse(
                     NetworkResponse response) {
