@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import android.content.Context;
 
+import com.android.tvapp.util.GlobalRequest;
 import com.android.tvapp.util.Log;
 import com.android.tvapp.util.Utils;
 import com.android.volley.NetworkResponse;
@@ -13,7 +14,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 public class PollRequest implements Listener<String>, ErrorListener {
 
@@ -52,7 +52,7 @@ public class PollRequest implements Listener<String>, ErrorListener {
                 return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
             }
         };
-        Volley.newRequestQueue(mContext).add(request);
+        GlobalRequest.get(mContext).getRequestQueue().add(request);
     }
 
     @Override

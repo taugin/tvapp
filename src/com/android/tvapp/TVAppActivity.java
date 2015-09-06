@@ -72,7 +72,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         if (mRequestCount > Long.MAX_VALUE) {
             mRequestCount = 0;
         }
-        // Log.d(Log.TAG, "mRequestCount : " + mRequestCount);
+        Log.d(Log.TAG, "Poll Request Count : " + mRequestCount);
         mPollRequest.requestPollInfo();
     }
 
@@ -109,7 +109,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (mTaskList == null) {
+                if (mTaskList == null || mTaskList.isEmpty()) {
                     Log.d(Log.TAG, "TaskList is Empty");
                     return ;
                 }
