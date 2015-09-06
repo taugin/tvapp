@@ -5,6 +5,9 @@ import java.net.URLEncoder;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.Bitmap.Config;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
@@ -80,18 +83,26 @@ public class VolleyImageLoader extends ImageLoader {
             Log.d(Log.TAG, "w : " + w + " , h : " + h);
             int newW = w;
             int newH = h;
+            boolean needScale = false;
             if (w > 4096) {
                 newW = 4096;
+                needScale = true;
             }
             if (h > 4096) {
                 newH = 4096;
+                needScale = true;
             }
-            Bitmap dstBmp = Bitmap.createScaledBitmap(srcBmp, newW, newH, false);
-            if (srcBmp != dstBmp) {
+            if (needScale) {
+                Bitmap dstBmp = Bitmap.createBitmap(newW, newH, Config.RGB_565);
+                Canvas canvas = new Canvas(dstBmp);
+                Rect src = new Rect(0, 0, w, h);
+                Rect dst = new Rect(0, 0, newW, newH);
+                canvas.drawBitmap(srcBmp, src,  dst, null);
                 srcBmp.recycle();
+                Log.d(Log.TAG, "srcBmp : " + srcBmp + " , dstBmp : " + dstBmp);
+                return dstBmp;
             }
-            Log.d(Log.TAG, "srcBmp : " + srcBmp + " , dstBmp : " + dstBmp);
-            return dstBmp;
+            return srcBmp;
         }
         return null;
     }
@@ -105,4 +116,5 @@ public class VolleyImageLoader extends ImageLoader {
         }
         return url;
     }
+    
 }
