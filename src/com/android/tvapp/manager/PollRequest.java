@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import android.content.Context;
 
+import com.android.tvapp.info.PollInfo;
 import com.android.tvapp.util.GlobalRequest;
 import com.android.tvapp.util.Log;
 import com.android.tvapp.util.Utils;
@@ -14,14 +15,17 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
+import com.google.gson.Gson;
 
 public class PollRequest implements Listener<String>, ErrorListener {
 
     private Context mContext;
+    private Gson mGson;
 
     private OnPollRequestCompletedListener mOnPollRequestCompletedListener;
     public PollRequest(Context context) {
         mContext = context;
+        mGson = new Gson();
     }
 
     public void setOnPollRequestCompletedListener(OnPollRequestCompletedListener l) {
@@ -66,12 +70,22 @@ public class PollRequest implements Listener<String>, ErrorListener {
     @Override
     public void onResponse(String response) {
         // Log.d(Log.TAG, "response : " + response);
+        PollInfo pollInfo = null;
+        try {
+            if (mGson == null) {
+                mGson = new Gson();
+            }
+            pollInfo = mGson.fromJson(response, PollInfo.class);
+        } catch(Exception e) {
+            Log.d(Log.TAG, "error : " + e);
+        }
+        Log.d(Log.TAG, "pollInfo : " + pollInfo);
         if (mOnPollRequestCompletedListener != null) {
-            mOnPollRequestCompletedListener.onPollRequestCompleted(response);
+            mOnPollRequestCompletedListener.onPollRequestCompleted(pollInfo);
         }
     }
     
     public interface OnPollRequestCompletedListener{
-        public void onPollRequestCompleted(String taskId);
+        public void onPollRequestCompleted(PollInfo pollInfo);
     }
 }

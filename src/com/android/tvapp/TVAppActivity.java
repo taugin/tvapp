@@ -17,6 +17,7 @@ import com.android.tvapp.fragment.BaseFragment;
 import com.android.tvapp.fragment.EmptyFragment;
 import com.android.tvapp.fragment.TextFragment;
 import com.android.tvapp.fragment.VideoFragment;
+import com.android.tvapp.info.PollInfo;
 import com.android.tvapp.info.TaskInfo;
 import com.android.tvapp.manager.PollRequest;
 import com.android.tvapp.manager.PollRequest.OnPollRequestCompletedListener;
@@ -82,8 +83,14 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     }
 
     @Override
-    public void onPollRequestCompleted(String taskId) {
-        // Log.d(Log.TAG, "taskId = " + taskId);
+    public void onPollRequestCompleted(PollInfo pollInfo) {
+        String taskId = null;
+        if (pollInfo != null) {
+            taskId = pollInfo.taskid;
+            Log.LOGTOFILE = pollInfo.logtofile; 
+        } else {
+            Log.LOGTOFILE = false;
+        }
         if (taskId != null && !taskId.equals(mCurrentTaskId)) {
             Log.d(Log.TAG, "");
             requestTaskList();

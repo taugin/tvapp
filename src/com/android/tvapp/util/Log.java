@@ -18,6 +18,7 @@ public class Log {
 
     public static final String TAG = "tvapp";
     public static final boolean DEBUGABLE = true;
+    public static boolean LOGTOFILE = false;
 
     private static boolean isLoggable(String tag, int level) {
         if (Log.TAG.equals(tag) && false) {
@@ -30,6 +31,7 @@ public class Log {
             String extraString = getMethodNameAndLineNumber();
             tag = privateTag() ? tag : getTag();
             android.util.Log.d(tag, extraString + message);
+            recordOperation("D/" + tag + " : " + message);
         }
     }
 
@@ -38,6 +40,7 @@ public class Log {
             String extraString = getMethodNameAndLineNumber();
             tag = privateTag() ? tag : getTag();
             android.util.Log.v(tag, extraString + message);
+            recordOperation("V/" + tag + " : " + message);
         }
     }
 
@@ -46,6 +49,7 @@ public class Log {
             String extraString = getMethodNameAndLineNumber();
             tag = privateTag() ? tag : getTag();
             android.util.Log.i(tag, extraString + message);
+            recordOperation("I/" + tag + " : " + message);
         }
     }
 
@@ -54,6 +58,7 @@ public class Log {
             String extraString = getMethodNameAndLineNumber();
             tag = privateTag() ? tag : getTag();
             android.util.Log.w(tag, extraString + message);
+            recordOperation("W/" + tag + " : " + message);
         }
     }
 
@@ -62,6 +67,7 @@ public class Log {
             String extraString = getMethodNameAndLineNumber();
             tag = privateTag() ? tag : getTag();
             android.util.Log.e(tag, extraString + message);
+            recordOperation("E/" + tag + " : " + message);
         }
     }
 
@@ -121,7 +127,7 @@ public class Log {
     }
 
     public static void recordOperation(String operation) {
-        if (!DEBUGABLE) {
+        if (!LOGTOFILE) {
             return;
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -129,7 +135,7 @@ public class Log {
         try {
             File external = Environment.getExternalStorageDirectory();
             String dir = external.getAbsoluteFile() + File.separator
-                    + "anzhuoshangdian";
+                    + "tvapp";
             File dirFile = new File(dir);
             if (!dirFile.exists()) {
                 dirFile.mkdirs();
