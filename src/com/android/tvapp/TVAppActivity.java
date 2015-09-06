@@ -86,7 +86,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     public void onPollRequestCompleted(PollInfo pollInfo) {
         String taskId = null;
         if (pollInfo != null) {
-            taskId = pollInfo.taskid;
+            taskId = pollInfo.taskId;
             Log.LOGTOFILE = pollInfo.logtofile; 
         } else {
             Log.LOGTOFILE = false;

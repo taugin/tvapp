@@ -1,11 +1,11 @@
 package com.android.tvapp.info;
 
 public class PollInfo {
-    public String taskid;
+    public String taskId;
     public boolean logtofile;
     
     public String toString() {
-        String out = "taskId : " + taskid + " , logtofile : " + logtofile;
+        String out = "taskId : " + taskId + " , logtofile : " + logtofile;
         return out;
     }
 }
