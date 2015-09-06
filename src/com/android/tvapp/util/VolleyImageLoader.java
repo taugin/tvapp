@@ -87,7 +87,10 @@ public class VolleyImageLoader extends ImageLoader {
                 newH = 4096;
             }
             Bitmap dstBmp = Bitmap.createScaledBitmap(srcBmp, newW, newH, false);
-            srcBmp.recycle();
+            if (srcBmp != dstBmp) {
+                srcBmp.recycle();
+            }
+            Log.d(Log.TAG, "srcBmp : " + srcBmp + " , dstBmp : " + dstBmp);
             return dstBmp;
         }
         return null;

@@ -14,6 +14,7 @@ import android.text.TextUtils;
 
 import com.android.tvapp.fragment.AudioFragment;
 import com.android.tvapp.fragment.BaseFragment;
+import com.android.tvapp.fragment.EmptyFragment;
 import com.android.tvapp.fragment.TextFragment;
 import com.android.tvapp.fragment.VideoFragment;
 import com.android.tvapp.info.TaskInfo;
@@ -40,6 +41,10 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         super.onCreate(savedInstanceState);
         register();
         setContentView(R.layout.activity_tvapp);
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction();
+        transaction.replace(R.id.fragment_layout, new EmptyFragment());
+        transaction.commitAllowingStateLoss();
         mHandler = new Handler();
         mPollRequest = new PollRequest(this);
         mPollRequest.setOnPollRequestCompletedListener(this);
@@ -111,6 +116,11 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
             public void run() {
                 if (mTaskList == null || mTaskList.isEmpty()) {
                     Log.d(Log.TAG, "TaskList is Empty");
+                    FragmentTransaction transaction = getSupportFragmentManager()
+                            .beginTransaction();
+                    transaction.replace(R.id.fragment_layout,
+                            new EmptyFragment());
+                    transaction.commitAllowingStateLoss();
                     return ;
                 }
                 BaseFragment fragment = null;
