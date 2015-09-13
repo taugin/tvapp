@@ -18,6 +18,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,6 +37,7 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
 
     private CustomViewFlipper mViewFlipper;
     private AudioPlayHelper mAudoPlayHelper;
+    private Handler mHandler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +45,7 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
         View view = inflater.inflate(R.layout.tvapp_showaudio, null);
         mViewFlipper = (CustomViewFlipper) view.findViewById(R.id.viewflipper);
         mViewFlipper.setOnClickListener(this);
+        mHandler = new Handler();
         return view;
     }
 
@@ -100,12 +104,35 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
         }
 
         String musicUrl = mTaskInfo.audiourl;
-        Log.d(Log.TAG, "audiourl : " + musicUrl);
-        mAudoPlayHelper = new AudioPlayHelper();
-        mAudoPlayHelper.setOnCompleteListener(this);
-        mAudoPlayHelper.playUrl(musicUrl);
-        Log.d(Log.TAG, "after playurl");
+        if (!TextUtils.isEmpty(musicUrl)) {
+            Log.d(Log.TAG, "audiourl : " + musicUrl);
+            mAudoPlayHelper = new AudioPlayHelper();
+            mAudoPlayHelper.setOnCompleteListener(this);
+            mAudoPlayHelper.playUrl(musicUrl);
+            Log.d(Log.TAG, "after playurl");
+        } else {
+            if (mHandler != null) {
+                long time = 0;
+                try {
+                    time = Long.parseLong(mTaskInfo.time);
+                    time = time * 1000;
+                } catch(NumberFormatException e) {
+                    time = 10 * 1000;
+                }
+                Log.d(Log.TAG, "time : " + time);
+                mHandler.postDelayed(mRunnable, time);
+            }
+        }
     }
+
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(Log.TAG, "send text task complete");
+            Intent intent = new Intent(Utils.TASK_COMPLETE);
+            getActivity().sendBroadcast(intent);
+        }
+    };
 
     @Override
     public void onComplete() {
