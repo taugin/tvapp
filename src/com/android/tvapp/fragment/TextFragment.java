@@ -77,7 +77,9 @@ public class TextFragment extends BaseFragment {
         public void run() {
             Log.d(Log.TAG, "send text task complete");
             Intent intent = new Intent(Utils.TASK_COMPLETE);
-            getActivity().sendBroadcast(intent);
+            if (getActivity() != null) {
+                getActivity().sendBroadcast(intent);
+            }
         }
     };
 }
