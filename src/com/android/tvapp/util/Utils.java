@@ -18,6 +18,7 @@ public class Utils {
 
     private static final String INTERNET_URL = "http://218.92.26.6:8011/";
     private static final String LAN_URL = "http://192.168.5.254:8080/";
+    private static final String LAN_URL2 = "http://192.168.1.2:8080/";
     private static final String HOST_URL = INTERNET_URL;
     @Deprecated
     public static final String UPGRADE_URL = HOST_URL + "multimedia/upload/version/update.json";

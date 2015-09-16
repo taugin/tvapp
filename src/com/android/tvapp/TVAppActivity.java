@@ -78,7 +78,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         if (mRequestCount > Long.MAX_VALUE) {
             mRequestCount = 0;
         }
-        Log.d(Log.TAG, "Poll Request Count : " + mRequestCount);
+        // Log.d(Log.TAG, "Poll Request Count : " + mRequestCount);
         mPollRequest.requestPollInfo();
     }
 

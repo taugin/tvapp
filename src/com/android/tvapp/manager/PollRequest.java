@@ -79,7 +79,7 @@ public class PollRequest implements Listener<String>, ErrorListener {
         } catch(Exception e) {
             Log.d(Log.TAG, "error : " + e);
         }
-        Log.d(Log.TAG, "pollInfo : " + pollInfo);
+        // Log.d(Log.TAG, "pollInfo : " + pollInfo);
         if (mOnPollRequestCompletedListener != null) {
             mOnPollRequestCompletedListener.onPollRequestCompleted(pollInfo);
         }

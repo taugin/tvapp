@@ -3,6 +3,8 @@ package com.android.tvapp.fragment;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -38,6 +40,7 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
     private CustomViewFlipper mViewFlipper;
     private AudioPlayHelper mAudoPlayHelper;
     private Handler mHandler;
+    private List<Bitmap> mBitmaps;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,6 +55,7 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mBitmaps = new ArrayList<Bitmap>();
         start();
     }
 
@@ -62,6 +66,13 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
         if (mViewFlipper != null) {
             mViewFlipper.stopFlipping();
         }
+        if (mBitmaps != null) {
+            for (Bitmap bitmap : mBitmaps) {
+                if (bitmap != null && !bitmap.isRecycled()) {
+                    bitmap.recycle();
+                }
+            }
+        }
         if (mAudoPlayHelper != null) {
             mAudoPlayHelper.stop();
         }
@@ -69,6 +80,9 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
 
     private void addBgImage() {
         mViewFlipper.removeAllViews();
+        if (mBitmaps != null) {
+            mBitmaps.clear();
+        }
         ImageView imageView = null;
         for (String url : mTaskInfo.imgurl) {
             Log.d(Log.TAG, "imgurl : " + url);
@@ -165,8 +179,9 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            Log.d(Log.TAG, "imgurl : " + mImgUrl + " , bitmap : " + bitmap);
             if (bitmap != null) {
+                Log.d(Log.TAG, "imgurl : " + mImgUrl + " , w : " + bitmap.getWidth() + " , h : " + bitmap.getHeight());
+                mBitmaps.add(bitmap);
                 mImageView.setImageBitmap(bitmap);
             }
         }
@@ -189,23 +204,17 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
                     is.close();
                     byte[] bitmapByte = baos.toByteArray();
                     baos.close();
-                    Options opts = new Options();
-                    opts.inJustDecodeBounds = true;
-                    BitmapFactory.decodeByteArray(bitmapByte, 0, bitmapByte.length, opts);
-                    Log.d(Log.TAG, "w : " + opts.outWidth + " , h : " + opts.outHeight);
-                    boolean needSample = false;
-                    if (opts.outWidth > 4096) {
-                        needSample = true;
+                    Bitmap bitmap = null;
+                    int simpleSize = 1;
+                    while(true) {
+                        bitmap = handlePic(bitmapByte, simpleSize);
+                        // Log.d(Log.TAG, "bitmap : " + bitmap);
+                        if (bitmap == null) {
+                            simpleSize <<= 1;
+                        } else {
+                            break;
+                        }
                     }
-                    if (opts.outHeight > 4096) {
-                        opts.outHeight = 4096;
-                        needSample = true;
-                    }
-                    if (needSample) {
-                        opts.inSampleSize = 2;
-                    }
-                    opts.inJustDecodeBounds = false;
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapByte, 0, bitmapByte.length, opts);
                     return bitmap;
                 }
             } catch (ClientProtocolException e) {
@@ -219,5 +228,24 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
             }
             return null;
         }
+    }
+
+    private Bitmap handlePic(byte []data, int simpleSize) {
+        try {
+            Options opts = new Options();
+            opts.inSampleSize = simpleSize;
+            opts.inJustDecodeBounds = false;
+            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opts);
+            if (bitmap.getWidth() > 4096 || bitmap.getHeight() > 4096) {
+                bitmap.recycle();
+                return null;
+            }
+            return bitmap;
+        } catch(OutOfMemoryError error) {
+            Log.d(Log.TAG, "error : " + error);
+        } catch(Exception e) {
+            Log.d(Log.TAG, "error : " + e);
+        }
+        return null;
     }
 }
