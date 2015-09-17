@@ -369,6 +369,7 @@ public class UpgradeManager implements Runnable, OnClickListener {
             v.setEnabled(false);
             v.setBackgroundColor(mContext.getResources().getColor(android.R.color.transparent));
             ((TextView)v).setText(R.string.connecting);
+            ((TextView)v).setTextColor(Color.WHITE);
             break;
         case R.id.cancel:
             mCancelDownload = true;
