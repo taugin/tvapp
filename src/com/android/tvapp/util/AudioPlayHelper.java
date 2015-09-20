@@ -64,6 +64,10 @@ public class AudioPlayHelper implements OnCompletionListener, MediaPlayer.OnPrep
         mediaPlayer.pause();
     }
 
+    public boolean isPlaying() {
+        return mediaPlayer.isPlaying();
+    }
+
     public void stop() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();

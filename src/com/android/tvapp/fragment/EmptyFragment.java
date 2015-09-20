@@ -13,4 +13,12 @@ public class EmptyFragment extends BaseFragment {
             Bundle savedInstanceState) {
         return inflater.inflate(R.layout.empty_fragment, null);
     }
+
+    @Override
+    public void pauseTask() {
+    }
+
+    @Override
+    public void resumeTask() {
+    }
 }

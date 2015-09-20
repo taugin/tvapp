@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.android.tvapp.fragment.AudioFragment;
 import com.android.tvapp.fragment.BaseFragment;
@@ -30,18 +32,23 @@ import com.android.tvapp.util.Utils;
 public class TVAppActivity extends FragmentActivity implements OnTaskRequestCompletedListener, OnPollRequestCompletedListener {
     private static final long REQUEST_INTERVAL = 10 * 1000;
     private List<TaskInfo> mTaskList;
+    private BaseFragment mCurrentFragment;
     private int mCurrentIndex = 0;
     private Handler mHandler;
     private long mRequestCount = 0;
     private PollRequest mPollRequest;
     private TaskRequest mTaskRequest;
     private String mCurrentTaskId = "noset";
+    private boolean mTaskPlayStatus = true;
+    private ImageView mImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         register();
         setContentView(R.layout.activity_tvapp);
+        mImageView = (ImageView) findViewById(R.id.playpause);
+        mImageView.setVisibility(View.GONE);
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction();
         transaction.replace(R.id.fragment_layout, new EmptyFragment());
@@ -84,19 +91,36 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
 
     @Override
     public void onPollRequestCompleted(PollInfo pollInfo) {
+        Log.d(Log.TAG, "" + pollInfo);
         String taskId = null;
+        boolean status = true;
         if (pollInfo != null) {
             taskId = pollInfo.taskId;
             Log.LOGTOFILE = pollInfo.logtofile; 
+            status = pollInfo.status;
         } else {
             Log.LOGTOFILE = false;
         }
         if (taskId != null && !taskId.equals(mCurrentTaskId)) {
             Log.d(Log.TAG, "");
             requestTaskList();
+        }else if (mTaskPlayStatus != status) {
+            mTaskPlayStatus = status;
+            changeTaskStatus();
         }
         mCurrentTaskId = taskId;
         mHandler.postDelayed(mRequestPollRunnable, REQUEST_INTERVAL);
+    }
+
+    private void changeTaskStatus() {
+        if (mCurrentFragment != null) {
+            mImageView.setVisibility(mTaskPlayStatus ? View.GONE : View.VISIBLE);
+            if (mTaskPlayStatus) {
+                mCurrentFragment.resumeTask();
+            } else {
+                mCurrentFragment.pauseTask();
+            }
+        }
     }
 
     @Override
@@ -149,6 +173,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                                 .beginTransaction();
                         transaction.replace(R.id.fragment_layout, fragment);
                         transaction.commitAllowingStateLoss();
+                        mCurrentFragment = fragment;
                     }
                 } catch(Exception e) {
                     Log.d(Log.TAG, "error : " + e);

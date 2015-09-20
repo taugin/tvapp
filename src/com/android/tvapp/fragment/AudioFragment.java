@@ -14,13 +14,12 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,14 +31,12 @@ import android.widget.ImageView.ScaleType;
 import com.android.tvapp.R;
 import com.android.tvapp.util.AudioPlayHelper;
 import com.android.tvapp.util.Log;
-import com.android.tvapp.util.Utils;
 import com.android.tvapp.view.CustomViewFlipper;
 
 public class AudioFragment extends BaseFragment implements OnCompleteListener, OnClickListener {
 
     private CustomViewFlipper mViewFlipper;
     private AudioPlayHelper mAudoPlayHelper;
-    private Handler mHandler;
     private List<Bitmap> mBitmaps;
 
     @Override
@@ -48,7 +45,6 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
         View view = inflater.inflate(R.layout.tvapp_showaudio, null);
         mViewFlipper = (CustomViewFlipper) view.findViewById(R.id.viewflipper);
         mViewFlipper.setOnClickListener(this);
-        mHandler = new Handler();
         return view;
     }
 
@@ -78,6 +74,30 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
         }
     }
 
+    public void pauseTask() {
+        Log.d(Log.TAG, "");
+        mViewFlipper.stopFlipping();
+        if (mTaskInfo != null && !TextUtils.isEmpty(mTaskInfo.audiourl)) {
+            if (mAudoPlayHelper != null && mAudoPlayHelper.isPlaying()) {
+                mAudoPlayHelper.pause();
+            }
+        } else {
+            super.pauseTask();
+        }
+    }
+
+    public void resumeTask() {
+        Log.d(Log.TAG, "");
+        mViewFlipper.startFlipping();
+        if (mTaskInfo != null && !TextUtils.isEmpty(mTaskInfo.audiourl)) {
+            if (mAudoPlayHelper != null) {
+                mAudoPlayHelper.play();
+            }
+        } else {
+            super.resumeTask();
+        }
+    }
+
     private void addBgImage() {
         mViewFlipper.removeAllViews();
         if (mBitmaps != null) {
@@ -88,19 +108,13 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
             Log.d(Log.TAG, "imgurl : " + url);
             imageView = new ImageView(getActivity());
             imageView.setScaleType(ScaleType.FIT_CENTER);
-            /*
-            VolleyImageLoader loader = VolleyImageLoader.getVolleyImageLoader(getActivity());
-            ImageListener imageListener = VolleyImageLoader.getImageListener(imageView, 0);
-            imageView.setTag(VolleyImageLoader.encodeUrl(url));
-            loader.get(url, imageListener);
-            */
             ImageLoader loader = new ImageLoader(url, imageView);
             loader.execute();
             mViewFlipper.addView(imageView);
         }
     }
 
-    private void start() {
+    protected void start() {
         Log.d(Log.TAG, "");
         if (mViewFlipper != null) {
             int interval = 0;
@@ -125,43 +139,20 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
             mAudoPlayHelper.playUrl(musicUrl);
             Log.d(Log.TAG, "after playurl");
         } else {
-            if (mHandler != null) {
-                long time = 0;
-                try {
-                    time = Long.parseLong(mTaskInfo.time);
-                    time = time * 1000;
-                } catch(NumberFormatException e) {
-                    time = 10 * 1000;
-                }
-                Log.d(Log.TAG, "time : " + time);
-                mHandler.postDelayed(mRunnable, time);
-            }
+            super.start();
         }
     }
-
-    private Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            Log.d(Log.TAG, "send text task complete");
-            Intent intent = new Intent(Utils.TASK_COMPLETE);
-            if (getActivity() != null) {
-                getActivity().sendBroadcast(intent);
-            }
-        }
-    };
 
     @Override
     public void onComplete() {
         Log.d(Log.TAG, "send audio task complete");
-        Intent intent = new Intent(Utils.TASK_COMPLETE);
-        getActivity().sendBroadcast(intent);
+        sendCompleteBroadcast();
     }
 
     @Override
     public void onClick(View view) {
         Log.d(Log.TAG, "send audio task complete");
-        Intent intent = new Intent(Utils.TASK_COMPLETE);
-        getActivity().sendBroadcast(intent);
+        sendCompleteBroadcast();
     }
 
     class ImageLoader extends AsyncTask<Void, Void, Bitmap> {
@@ -180,7 +171,7 @@ public class AudioFragment extends BaseFragment implements OnCompleteListener, O
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             if (bitmap != null) {
-                Log.d(Log.TAG, "imgurl : " + mImgUrl + " , w : " + bitmap.getWidth() + " , h : " + bitmap.getHeight());
+                // Log.d(Log.TAG, "imgurl : " + mImgUrl + " , w : " + bitmap.getWidth() + " , h : " + bitmap.getHeight());
                 mBitmaps.add(bitmap);
                 mImageView.setImageBitmap(bitmap);
             }
