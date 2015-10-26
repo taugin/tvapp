@@ -2,9 +2,9 @@
     "ip": "192.168.5.22",
     "name": "会议室",
     "type": "audio",
-    "audiourl": "http://218.92.26.6:8000/multimedia/upload/music/kdf.mp3",
- "interval":"5",   "imgurl": ["http://218.92.26.6:8000/multimedia/upload/image/mountain.jpg",
-               "http://218.92.26.6:8000/multimedia/upload/image/dongwu.jpg"]
+    "interval":"5",
+    "time":"10",
+    "imgurl": ["http://d.hiphotos.baidu.com/image/pic/item/78310a55b319ebc4b455b4168026cffc1e17160b.jpg", "http://h.hiphotos.baidu.com/image/pic/item/c2fdfc039245d68843f7b26ca6c27d1ed31b2404.jpg"]
 },
 {
     "ip": "192.168.5.22",

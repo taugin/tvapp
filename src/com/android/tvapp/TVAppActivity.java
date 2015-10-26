@@ -14,7 +14,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.android.tvapp.fragment.AudioFragment;
+import com.android.tvapp.fragment.AudioFragment2;
 import com.android.tvapp.fragment.BaseFragment;
 import com.android.tvapp.fragment.EmptyFragment;
 import com.android.tvapp.fragment.TextFragment;
@@ -59,6 +59,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         mTaskRequest = new TaskRequest(this);
         mTaskRequest.setOnTaskRequestCompletedListener(this);
         newVersionCheck();
+        requestTaskList();
     }
 
     private void newVersionCheck() {
@@ -67,7 +68,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     }
 
     private void requestTaskList() {
-        // Log.d(Log.TAG, "Request TaskList " + mRequestCount + " times");
+        Log.d(Log.TAG, "Request TaskList " + mRequestCount + " times");
         mTaskRequest.requestTaskInfo();
     }
 
@@ -215,7 +216,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
             if (type.equals("text")) {
                 return new TextFragment();
             } else if (type.equals("audio")) {
-                return new AudioFragment();
+                return new AudioFragment2();
             } else if (type.equals("video")) {
                 return new VideoFragment();
             }
