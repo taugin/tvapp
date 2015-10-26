@@ -80,6 +80,11 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         builder.append(tmp);
         builder.append(" ");
         builder.append(ip);
+        builder.append("\n");
+        tmp = getResources().getString(R.string.remoteaddress);
+        builder.append(tmp);
+        builder.append(" ");
+        builder.append(Utils.HOST_URL);
         mTextView.setText(builder.toString());
         mHandler.postDelayed(mDismissRunnable, 10 * 1000);
     }

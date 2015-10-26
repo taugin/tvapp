@@ -1,8 +1,15 @@
 package com.android.tvapp.util;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -13,6 +20,8 @@ import org.apache.http.conn.util.InetAddressUtils;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Environment;
+import android.text.TextUtils;
 
 public class Utils {
 
@@ -24,7 +33,34 @@ public class Utils {
     private static final String INTERNET_URL = "http://218.92.26.6:8011/";
     private static final String LAN_URL = "http://192.168.5.254:8080/";
     private static final String LAN_URL2 = "http://192.168.1.2:8080/";
-    private static final String HOST_URL = INTERNET_URL;
+    public static final String HOST_URL;
+    static {
+        String configedUrl = null;
+        File external = Environment.getExternalStorageDirectory();
+        if (external != null) {
+            File tvConfig = new File(external, "tvserver_addr.txt");
+            if (tvConfig.exists()) {
+                try {
+                    FileInputStream fis = new FileInputStream(tvConfig);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+                    String line = br.readLine();
+                    br.close();
+                    new URL(line);
+                    configedUrl = line;
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if (TextUtils.isEmpty(configedUrl)) {
+            HOST_URL = INTERNET_URL;
+        } else {
+            HOST_URL = configedUrl;
+        }
+    }
     @Deprecated
     public static final String UPGRADE_URL = HOST_URL + "multimedia/upload/version/update.json";
     @Deprecated

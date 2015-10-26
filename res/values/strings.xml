@@ -16,5 +16,6 @@
     <string name="loading">加载中 &#8230;</string>
     <string name="empty_tasklist">任务列表为空</string>
     <string name="version">当前版本 :</string>
-    <string name="ipaddress">当前地址 :</string>
+    <string name="ipaddress">本机地址 :</string>
+    <string name="remoteaddress">远程地址 :</string>
 </resources>
