@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.tvapp.fragment.AudioFragment2;
 import com.android.tvapp.fragment.BaseFragment;
@@ -41,12 +42,14 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     private String mCurrentTaskId = "noset";
     private boolean mTaskPlayStatus = true;
     private ImageView mImageView;
+    private TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         register();
         setContentView(R.layout.activity_tvapp);
+        mTextView = (TextView) findViewById(R.id.show_state);
         mImageView = (ImageView) findViewById(R.id.playpause);
         mImageView.setVisibility(View.GONE);
         FragmentTransaction transaction = getSupportFragmentManager()
@@ -60,7 +63,33 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         mTaskRequest.setOnTaskRequestCompletedListener(this);
         newVersionCheck();
         requestTaskList();
+        showDebugString();
     }
+
+    private void showDebugString() {
+        String ver = Utils.getAppVersion(this);
+        String ip = Utils.getIpAddress();
+        StringBuilder builder = new StringBuilder();
+        String tmp = null;
+        tmp = getResources().getString(R.string.version);
+        builder.append(tmp);
+        builder.append(" ");
+        builder.append(ver);
+        builder.append("\n");
+        tmp = getResources().getString(R.string.ipaddress);
+        builder.append(tmp);
+        builder.append(" ");
+        builder.append(ip);
+        mTextView.setText(builder.toString());
+        mHandler.postDelayed(mDismissRunnable, 10 * 1000);
+    }
+
+    private Runnable mDismissRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mTextView.setVisibility(View.GONE);
+        }
+    };
 
     private void newVersionCheck() {
         UpgradeManager manager = new UpgradeManager(this);
@@ -129,6 +158,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         super.onDestroy();
         unregister();
         mHandler.removeCallbacks(mRequestPollRunnable);
+        mHandler.removeCallbacks(mDismissRunnable);
     }
 
     private void register() {

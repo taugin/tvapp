@@ -10,6 +10,10 @@ import java.util.Map;
 
 import org.apache.http.conn.util.InetAddressUtils;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+
 public class Utils {
 
     public static final boolean USE_TEST_MODE = false;
@@ -91,6 +95,17 @@ public class Utils {
             Log.d(Log.TAG, "error : " + e);
         }
         return ipaddress;
+    }
+
+    public static String getAppVersion(Context context) {
+        try {
+            PackageManager mPm = context.getPackageManager();
+            PackageInfo info = mPm.getPackageInfo(context.getPackageName(), 0);
+            return info.versionName;
+        } catch (Exception e) {
+            Log.d(Log.TAG, "error : " + e);
+        }
+        return null;
     }
 
     public static String string2MD5(String inStr) {

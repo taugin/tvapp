@@ -16,4 +16,14 @@
         android:layout_alignParentRight="true"
         android:src="@drawable/player_pause"
         />
+    <TextView
+        android:id="@+id/show_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@android:color/white"
+        android:background="#CC000000"
+        />
 </RelativeLayout>
