@@ -3,8 +3,11 @@
     "name": "会议室",
     "type": "audio",
     "interval":"5",
-    "time":"10",
-    "imgurl": ["http://d.hiphotos.baidu.com/image/pic/item/78310a55b319ebc4b455b4168026cffc1e17160b.jpg", "http://h.hiphotos.baidu.com/image/pic/item/c2fdfc039245d68843f7b26ca6c27d1ed31b2404.jpg"]
+    "time":"30",
+    "imgurl": ["http://d.hiphotos.baidu.com/image/pic/item/78310a55b319ebc4b455b4168026cffc1e17160b.jpg", 
+               "http://h.hiphotos.baidu.com/image/pic/item/c2fdfc039245d68843f7b26ca6c27d1ed31b2404.jpg",
+               "http://f.hiphotos.baidu.com/image/pic/item/ac4bd11373f082022707d43e49fbfbedab641b1d.jpg",
+               "http://f.hiphotos.baidu.com/image/pic/item/8601a18b87d6277f7b8928362a381f30e924fc21.jpg"]
 },
 {
     "ip": "192.168.5.22",
