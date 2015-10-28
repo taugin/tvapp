@@ -168,4 +168,16 @@ public class Utils {
         }
         return hexValue.toString();
     }
+
+    public static File getPicCache() {
+        File cacheDir = Environment.getExternalStoragePublicDirectory("tvapp");
+        if (cacheDir != null) {
+            File tmpDir = new File(cacheDir, "pic_dir");
+            if (tmpDir != null) {
+                tmpDir.mkdirs();
+                return tmpDir.getAbsoluteFile();
+            }
+        }
+        return null;
+    }
 }

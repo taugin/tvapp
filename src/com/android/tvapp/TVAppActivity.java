@@ -123,7 +123,9 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
             mRequestCount = 0;
         }
         // Log.d(Log.TAG, "Poll Request Count : " + mRequestCount);
-        mPollRequest.requestPollInfo();
+        if (mPollRequest != null) {
+            mPollRequest.requestPollInfo();
+        }
     }
 
     @Override
@@ -164,25 +166,14 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     protected void onDestroy() {
         super.onDestroy();
         unregister();
+        mPollRequest = null;
         mHandler.removeCallbacks(mRequestPollRunnable);
         mHandler.removeCallbacks(mDismissRunnable);
         deleteCache();
     }
 
-    private File getPicCache() {
-        File cacheDir = Environment.getExternalStoragePublicDirectory("tvapp");
-        if (cacheDir != null) {
-            File tmpDir = new File(cacheDir, "pic_dir");
-            if (tmpDir != null) {
-                tmpDir.mkdirs();
-                return tmpDir.getAbsoluteFile();
-            }
-        }
-        return null;
-    }
-
     private void deleteCache() {
-        File cacheDir = getPicCache();
+        File cacheDir = Utils.getPicCache();
         if (cacheDir != null) {
             File fileList[] = cacheDir.listFiles();
             if (fileList != null) {
