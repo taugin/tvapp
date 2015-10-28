@@ -33,6 +33,8 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ImageView.ScaleType;
 import android.widget.ViewFlipper;
 
@@ -49,13 +51,22 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
     private ImageView mImageView1;
     private ImageView mImageView2;
     private int mIndex = 0;
+    private ProgressBar mProgressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mViewFlipper  = new MyViewFlipper(getActivity());
         mViewFlipper.setOnClickListener(this);
-        return mViewFlipper;
+        mProgressBar = new ProgressBar(getActivity());
+        mProgressBar.setVisibility(View.VISIBLE);
+        RelativeLayout layout = new RelativeLayout(getActivity());
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(-1, -1);
+        layout.addView(mViewFlipper, params);
+        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        layout.addView(mProgressBar, params);
+        return layout;
     }
 
     @Override
@@ -231,6 +242,7 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mProgressBar.setVisibility(View.INVISIBLE);
                 if (mViewFlipper == null || mTaskInfo == null || mTaskInfo.imgurl == null) {
                     return;
                 }
