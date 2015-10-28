@@ -115,6 +115,7 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
         if (cacheDir != null) {
             File fileList[] = cacheDir.listFiles();
             if (fileList != null) {
+                Log.d(Log.TAG, "Picture cache size : " + fileList.length);
                 for (File file : fileList) {
                     boolean exist = fileInTaskInfoList(file.getAbsolutePath());
                     Log.d(Log.TAG, "file : " + file + " , exist : " + exist);
@@ -194,22 +195,31 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
         if (mViewFlipper == null || mTaskInfo == null || mTaskInfo.imgurl == null) {
             return;
         }
-        mIndex ++;
-        if (mIndex >= mTaskInfo.imgurl.length) {
-            mIndex = 0;
-        }
+        movePointer();
         String url = null;
         if (mTaskInfo.imgurl.length > mIndex) {
             url = mTaskInfo.imgurl[mIndex];
         }
-        if (mViewFlipper.getCurrentView() == mImageView1) {
-            if (!TextUtils.isEmpty(url)) {
-                mImageView2.setImageBitmap(getBitmapByUrl(url));
-            }
+        Bitmap bitmap = null;
+        if (!TextUtils.isEmpty(url)) {
+            bitmap = getBitmapByUrl(url);
+        }
+        
+        if (bitmap == null) {
+            mViewFlipper.showNext();
         } else {
-            if (!TextUtils.isEmpty(url)) {
-                mImageView1.setImageBitmap(getBitmapByUrl(url));
+            if (mViewFlipper.getCurrentView() == mImageView1) {
+                 mImageView2.setImageBitmap(bitmap);
+            } else {
+                 mImageView1.setImageBitmap(bitmap);
             }
+        }
+    }
+
+    private void movePointer() {
+        mIndex ++;
+        if (mIndex >= mTaskInfo.imgurl.length) {
+            mIndex = 0;
         }
     }
 
@@ -252,6 +262,7 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
         @Override
         protected Void doInBackground(String... params) {
             if (params != null) {
+                Log.d(Log.TAG, "Start Download Pictures Size : " + params.length);
                 boolean ret = false;
                 for (String url : params) {
                     if (getActivity() == null) {
@@ -329,9 +340,12 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
                     }
                 }
                 if (bitmap != null) {
-                    FileOutputStream fos = new FileOutputStream(filePath);
+                    String tmpFile = filePath + ".tmp";
+                    FileOutputStream fos = new FileOutputStream(tmpFile);
                     bitmap.compress(CompressFormat.PNG, 80, fos);
                     fos.close();
+                    File tmp = new File(tmpFile);
+                    tmp.renameTo(new File(filePath));
                     return true;
                 }
             }
