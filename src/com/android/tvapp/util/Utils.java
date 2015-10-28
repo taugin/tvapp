@@ -169,8 +169,14 @@ public class Utils {
         return hexValue.toString();
     }
 
-    public static File getPicCache() {
+    public static File getPicCache(Context context) {
         File cacheDir = Environment.getExternalStoragePublicDirectory("tvapp");
+        if (cacheDir ==  null) {
+            if (context == null) {
+                return null;
+            }
+            cacheDir = context.getCacheDir();
+        }
         if (cacheDir != null) {
             File tmpDir = new File(cacheDir, "pic_dir");
             if (tmpDir != null) {

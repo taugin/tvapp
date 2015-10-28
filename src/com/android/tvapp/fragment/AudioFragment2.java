@@ -122,7 +122,7 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
     }
 
     private void deleteChangedPic() {
-        File cacheDir = Utils.getPicCache();
+        File cacheDir = Utils.getPicCache(getActivity());
         if (cacheDir != null) {
             File fileList[] = cacheDir.listFiles();
             if (fileList != null) {
@@ -376,7 +376,7 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
     private String getFilePath(String url) {
         String fileName = Utils.string2MD5(url);
         fileName += ".png";
-        File picDir = Utils.getPicCache();
+        File picDir = Utils.getPicCache(getActivity());
         if (picDir != null) {
             File filePath = new File(picDir, fileName);
             return filePath.getAbsolutePath();

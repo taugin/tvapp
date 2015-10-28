@@ -173,7 +173,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     }
 
     private void deleteCache() {
-        File cacheDir = Utils.getPicCache();
+        File cacheDir = Utils.getPicCache(this);
         if (cacheDir != null) {
             File fileList[] = cacheDir.listFiles();
             if (fileList != null) {
