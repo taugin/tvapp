@@ -1,5 +1,6 @@
 package com.android.tvapp;
 
+import java.io.File;
 import java.util.List;
 
 import android.content.BroadcastReceiver;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -164,6 +166,32 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         unregister();
         mHandler.removeCallbacks(mRequestPollRunnable);
         mHandler.removeCallbacks(mDismissRunnable);
+        deleteCache();
+    }
+
+    private File getPicCache() {
+        File cacheDir = Environment.getExternalStoragePublicDirectory("tvapp");
+        if (cacheDir != null) {
+            File tmpDir = new File(cacheDir, "pic_dir");
+            if (tmpDir != null) {
+                tmpDir.mkdirs();
+                return tmpDir.getAbsoluteFile();
+            }
+        }
+        return null;
+    }
+
+    private void deleteCache() {
+        File cacheDir = getPicCache();
+        if (cacheDir != null) {
+            File fileList[] = cacheDir.listFiles();
+            if (fileList != null) {
+                for (File file : fileList) {
+                    Log.d(Log.TAG, "file : " + file);
+                    file.delete();
+                }
+            }
+        }
     }
 
     private void register() {

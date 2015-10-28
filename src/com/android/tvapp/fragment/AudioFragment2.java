@@ -74,20 +74,6 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
         if (mAudoPlayHelper != null) {
             mAudoPlayHelper.stop();
         }
-        deleteCache();
-    }
-
-    private void deleteCache() {
-        File cacheDir = getPicCache();
-        if (cacheDir != null) {
-            File fileList[] = cacheDir.listFiles();
-            if (fileList != null) {
-                for (File file : fileList) {
-                    Log.d(Log.TAG, "file : " + file);
-                    file.delete();
-                }
-            }
-        }
     }
 
     public void pauseTask() {
@@ -124,7 +110,39 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
         mViewFlipper.addView(mImageView2);
     }
 
+    private void deleteChangedPic() {
+        File cacheDir = getPicCache();
+        if (cacheDir != null) {
+            File fileList[] = cacheDir.listFiles();
+            if (fileList != null) {
+                for (File file : fileList) {
+                    boolean exist = fileInTaskInfoList(file.getAbsolutePath());
+                    Log.d(Log.TAG, "file : " + file + " , exist : " + exist);
+                    if (!exist) {
+                        file.delete();
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean fileInTaskInfoList(String fileName) {
+        if (mTaskInfo == null || mTaskInfo.imgurl == null) {
+            return false;
+        }
+
+        String filePath = null;
+        for (String url : mTaskInfo.imgurl) {
+            filePath = getFilePath(url);
+            if (fileName != null && fileName.equals(filePath)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void loadNetImages() {
+        deleteChangedPic();
         if (mTaskInfo != null && mTaskInfo.imgurl != null) {
             ImageLoader loader = new ImageLoader();
             loader.execute(mTaskInfo.imgurl);
@@ -236,6 +254,9 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
             if (params != null) {
                 boolean ret = false;
                 for (String url : params) {
+                    if (getActivity() == null) {
+                        break;
+                    }
                     ret = savePic(url);
                     if (ret && !mNotified) {
                         mNotified = true;
@@ -271,6 +292,15 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
         if (TextUtils.isEmpty(url)) {
             return false;
         }
+        String filePath = getFilePath(url);
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        File file = new File(filePath);
+        if (file.exists()) {
+            return true;
+        }
+        Log.d(Log.TAG, "download file : " + filePath);
         HttpGet httpRequest = new HttpGet(url);
         HttpClient httpclient = new DefaultHttpClient();
         try {
@@ -299,8 +329,6 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
                     }
                 }
                 if (bitmap != null) {
-                    String filePath = getFilePath(url);
-                    Log.d(Log.TAG, "filePath : " + filePath);
                     FileOutputStream fos = new FileOutputStream(filePath);
                     bitmap.compress(CompressFormat.PNG, 80, fos);
                     fos.close();
