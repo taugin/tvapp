@@ -70,18 +70,20 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     }
 
     @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        Log.d(Log.TAG, "keyCode : " + keyCode);
-        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_MENU) {
-            showStatusInfo();
-            return true;
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+            if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_MENU) {
+                showStatusInfo();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                Intent intent = new Intent(Utils.TASK_COMPLETE);
+                sendBroadcast(intent);
+                return true;
+            }
         }
-        if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-            Intent intent = new Intent(Utils.TASK_COMPLETE);
-            sendBroadcast(intent);
-            return true;
-        }
-        return super.onKeyUp(keyCode, event);
+        return super.dispatchKeyEvent(event);
     }
 
     private void showDebugString() {
@@ -152,7 +154,6 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     }
 
     private void showStatusInfo() {
-        Log.d(Log.TAG, "mTextView.getVisibility() : " + mShowStatusView.getVisibility());
         if (mShowStatusView.getVisibility() != View.VISIBLE) {
             showDebugString();
         }
