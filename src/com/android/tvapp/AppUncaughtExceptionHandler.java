@@ -11,9 +11,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.content.Context;
-import android.os.Environment;
 
 import com.android.tvapp.util.Log;
+import com.android.tvapp.util.Utils;
 
 public class AppUncaughtExceptionHandler implements UncaughtExceptionHandler {
     public static final String TAG = "AppUncaughtExceptionHandler";
@@ -85,19 +85,15 @@ public class AppUncaughtExceptionHandler implements UncaughtExceptionHandler {
                 long timestamp = System.currentTimeMillis();
                 String time = formatter.format(new Date());
                 String fileName = "crash-" + time + "-" + timestamp + ".txt";
-                if (Environment.getExternalStorageState().equals(
-                        Environment.MEDIA_MOUNTED)) {
-                    String path = Environment.getExternalStorageDirectory()
-                            .toString() + "/tvapp/log/";
-                    File dir = new File(path);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    Log.d(Log.TAG, "path = " + (path + fileName));
-                    FileOutputStream fos = new FileOutputStream(path + fileName);
-                    fos.write(sb.toString().getBytes());
-                    fos.close();
+                String path = Utils.getExceptionLogDir(mContext);
+                File dir = new File(path);
+                if (!dir.exists()) {
+                    dir.mkdirs();
                 }
+                Log.d(Log.TAG, "path = " + (path + fileName));
+                FileOutputStream fos = new FileOutputStream(path + fileName);
+                fos.write(sb.toString().getBytes());
+                fos.close();
                 return fileName;
             } catch (Exception e) {
                 Log.e(TAG, "saveCrashInfo2File e[" + e + "]");

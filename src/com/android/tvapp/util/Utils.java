@@ -186,4 +186,20 @@ public class Utils {
         }
         return null;
     }
+
+    public static String getExceptionLogDir(Context context) {
+        String path = null;
+        try {
+            if (Environment.getExternalStorageState().equals(
+                    Environment.MEDIA_MOUNTED)) {
+                path = Environment.getExternalStorageDirectory()
+                        .toString() + "/tvapp/log/";
+            } else {
+                path = context.getCacheDir().toString() + "/tvapp/log/";
+            }
+        }catch(Exception e) {
+            Log.d(Log.TAG, "error : " + e);
+        }
+        return path;
+    }
 }
