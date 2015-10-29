@@ -18,4 +18,9 @@
     <string name="version">当前版本 :</string>
     <string name="ipaddress">本机地址 :</string>
     <string name="remoteaddress">远程地址 :</string>
+    <string name="acceptaddress">接收地址 :</string>
+    <string name="roomname">房间名称 : </string>
+    <string name="tasktime">任务时长 : </string>
+    <string name="taskinterval">任务间隔 : </string>
+    <string name="tasktype">任务类型 : </string>
 </resources>

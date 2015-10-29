@@ -8,11 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,14 +44,15 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     private String mCurrentTaskId = "noset";
     private boolean mTaskPlayStatus = true;
     private ImageView mImageView;
-    private TextView mTextView;
+    private TextView mShowStatusView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         register();
         setContentView(R.layout.activity_tvapp);
-        mTextView = (TextView) findViewById(R.id.show_state);
+        mShowStatusView = (TextView) findViewById(R.id.show_state);
+        mShowStatusView.setVisibility(View.GONE);
         mImageView = (ImageView) findViewById(R.id.playpause);
         mImageView.setVisibility(View.GONE);
         FragmentTransaction transaction = getSupportFragmentManager()
@@ -65,7 +66,22 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         mTaskRequest.setOnTaskRequestCompletedListener(this);
         newVersionCheck();
         requestTaskList();
-        showDebugString();
+        showStatusInfo();
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        Log.d(Log.TAG, "keyCode : " + keyCode);
+        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_MENU) {
+            showStatusInfo();
+            return true;
+        }
+        if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+            Intent intent = new Intent(Utils.TASK_COMPLETE);
+            sendBroadcast(intent);
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
     }
 
     private void showDebugString() {
@@ -87,14 +103,65 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         builder.append(tmp);
         builder.append(" ");
         builder.append(Utils.HOST_URL);
-        mTextView.setText(builder.toString());
+
+        TaskInfo taskInfo = getCurrentTaskInfo();
+        if (taskInfo != null) {
+            if (!TextUtils.isEmpty(taskInfo.name)) {
+                builder.append("\n");
+                tmp = getResources().getString(R.string.roomname);
+                builder.append(tmp);
+                builder.append(" ");
+                builder.append(taskInfo.name);
+            }
+
+            if (!TextUtils.isEmpty(taskInfo.time)) {
+                builder.append("\n");
+                tmp = getResources().getString(R.string.tasktime);
+                builder.append(tmp);
+                builder.append(" ");
+                builder.append(taskInfo.time);
+            }
+
+            if (!TextUtils.isEmpty(taskInfo.interval)) {
+                builder.append("\n");
+                tmp = getResources().getString(R.string.taskinterval);
+                builder.append(tmp);
+                builder.append(" ");
+                builder.append(taskInfo.interval);
+            }
+
+            if (!TextUtils.isEmpty(taskInfo.type)) {
+                builder.append("\n");
+                tmp = getResources().getString(R.string.tasktype);
+                builder.append(tmp);
+                builder.append(" ");
+                builder.append(taskInfo.type);
+            }
+
+            if (!TextUtils.isEmpty(taskInfo.ip)) {
+                builder.append("\n");
+                tmp = getResources().getString(R.string.acceptaddress);
+                builder.append(tmp);
+                builder.append(" ");
+                builder.append(taskInfo.ip);
+            }
+        }
+        mShowStatusView.setText(builder.toString());
+        mShowStatusView.setVisibility(View.VISIBLE);
         mHandler.postDelayed(mDismissRunnable, 10 * 1000);
+    }
+
+    private void showStatusInfo() {
+        Log.d(Log.TAG, "mTextView.getVisibility() : " + mShowStatusView.getVisibility());
+        if (mShowStatusView.getVisibility() != View.VISIBLE) {
+            showDebugString();
+        }
     }
 
     private Runnable mDismissRunnable = new Runnable() {
         @Override
         public void run() {
-            mTextView.setVisibility(View.GONE);
+            mShowStatusView.setVisibility(View.GONE);
         }
     };
 
@@ -196,6 +263,20 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
         unregisterReceiver(mBroadcastReceiver);
     }
 
+    private TaskInfo getCurrentTaskInfo() {
+        TaskInfo taskInfo = null;
+        try {
+            taskInfo = mTaskList.get(mCurrentIndex);
+        } catch (IndexOutOfBoundsException e) {
+            Log.d(Log.TAG, "error : " + e);
+            mCurrentIndex = 0;
+            taskInfo = mTaskList.get(mCurrentIndex);
+        } catch (Exception e) {
+            Log.d(Log.TAG, "error : " + e);
+        }
+        return taskInfo;
+    }
+
     private void showFragment() {
         mHandler.post(new Runnable() {
             @Override
@@ -210,14 +291,7 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                     return ;
                 }
                 BaseFragment fragment = null;
-                TaskInfo taskInfo = null;
-                try {
-                    taskInfo = mTaskList.get(mCurrentIndex);
-                } catch (IndexOutOfBoundsException e) {
-                    Log.d(Log.TAG, "error : " + e);
-                    mCurrentIndex = 0;
-                    taskInfo = mTaskList.get(mCurrentIndex);
-                }
+                TaskInfo taskInfo = getCurrentTaskInfo();
                 if (taskInfo != null && !TextUtils.isEmpty(taskInfo.type)) {
                     fragment = createFragment(taskInfo.type);
                 }
