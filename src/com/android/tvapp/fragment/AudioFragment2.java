@@ -254,7 +254,9 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
                 if (!TextUtils.isEmpty(url)) {
                     mImageView1.setImageBitmap(getBitmapByUrl(url));
                 }
-                mViewFlipper.startFlipping();
+                if (mTaskInfo.imgurl.length > 1) {
+                    mViewFlipper.startFlipping();
+                }
             }
         });
     }
