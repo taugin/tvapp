@@ -276,14 +276,16 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
 
     private TaskInfo getCurrentTaskInfo() {
         TaskInfo taskInfo = null;
-        try {
-            taskInfo = mTaskList.get(mCurrentIndex);
-        } catch (IndexOutOfBoundsException e) {
-            Log.d(Log.TAG, "error : " + e);
-            mCurrentIndex = 0;
-            taskInfo = mTaskList.get(mCurrentIndex);
-        } catch (Exception e) {
-            Log.d(Log.TAG, "error : " + e);
+        if (mTaskList != null && mTaskList.size() > 0) {
+            try {
+                taskInfo = mTaskList.get(mCurrentIndex);
+            } catch (IndexOutOfBoundsException e) {
+                Log.d(Log.TAG, "error : " + e);
+                mCurrentIndex = 0;
+                taskInfo = mTaskList.get(mCurrentIndex);
+            } catch (Exception e) {
+                Log.d(Log.TAG, "error : " + e);
+            }
         }
         return taskInfo;
     }
