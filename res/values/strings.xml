@@ -23,4 +23,5 @@
     <string name="tasktime">任务时长 : </string>
     <string name="taskinterval">任务间隔 : </string>
     <string name="tasktype">任务类型 : </string>
+    <string name="consumetime">消耗时间 : </string>
 </resources>

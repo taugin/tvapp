@@ -57,6 +57,24 @@ public class VideoFragment extends BaseFragment implements OnCompletionListener,
         mProgressBar.setVisibility(View.VISIBLE);
     }
 
+    public long getLeftTime() {
+        if (mVideoView != null) {
+            long curpos = mVideoView.getCurrentPosition();
+            long leftTime = curpos;
+            return leftTime > 0 ? leftTime : -1;
+        }
+        return -1;
+    }
+
+    @Override
+    public long getTotalTime() {
+        long time = -1;
+        if (mVideoView != null) {
+            time = mVideoView.getDuration() / 1000;
+        }
+        return time;
+    }
+
     public void pauseTask() {
         Log.d(Log.TAG, "");
         if (mVideoView != null) {

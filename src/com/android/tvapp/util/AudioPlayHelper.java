@@ -68,6 +68,23 @@ public class AudioPlayHelper implements OnCompletionListener, MediaPlayer.OnPrep
         return mediaPlayer.isPlaying();
     }
 
+    public long getLeftTime() {
+        if (mediaPlayer != null) {
+            long curpos = mediaPlayer.getCurrentPosition();
+            long leftTime = curpos;
+            return leftTime > 0 ? leftTime : -1;
+        }
+        return -1;
+    }
+
+    public long getTotalTime() {
+        long time  = -1;
+        if (mediaPlayer != null) {
+            time = mediaPlayer.getDuration() / 1000;
+        }
+        return time;
+    }
+
     public void stop() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();

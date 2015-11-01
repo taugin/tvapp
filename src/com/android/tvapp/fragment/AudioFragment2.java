@@ -160,6 +160,25 @@ public class AudioFragment2 extends BaseFragment implements OnCompleteListener,
         }
     }
 
+    public long getLeftTime() {
+        if (mTaskInfo != null && mTaskInfo.audiourl != null) {
+            if (mAudoPlayHelper != null) {
+                return mAudoPlayHelper.getLeftTime();
+            }
+        }
+        return super.getLeftTime();
+    }
+
+    @Override
+    public long getTotalTime() {
+        if (mTaskInfo != null && mTaskInfo.audiourl != null) {
+            if (mAudoPlayHelper != null) {
+                return mAudoPlayHelper.getTotalTime();
+            }
+        }
+        return super.getTotalTime();
+    }
+
     protected void start() {
         loadNetImages();
         Log.d(Log.TAG, "");

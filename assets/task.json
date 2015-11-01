@@ -2,12 +2,13 @@
     "ip": "192.168.5.20",
     "type": "text",
     "name": "会议室",
-    "texturl":"http://218.92.26.6:8000/multimedia/upload/doc/index.html",
+    "texturl":"file:///android_asset/index/index.html",
     "time": "30"
 },
 {
     "ip": "192.168.5.22",
     "name": "会议室",
+    "audiourl":"http://mp3hot.9ku.com/hot/2009/05-31/183203.mp3",
     "type": "audio",
     "interval":"5",
     "time":"30",
@@ -20,6 +21,6 @@
     "ip": "192.168.5.22",
     "name": "会议室",
     "type": "video",
-    "videourl": "http://218.92.26.6:8000/multimedia/upload/video/afas.mp4"
+    "videourl": "http://115.231.152.14/vhot2.qqvideo.tc.qq.com/u0136abl9tz.mp4?type=mp4&fmt=mp4&vkey=7191845BC51238BAF2012A513CB53764F5A5EC750BF8CA2FBA3D9F8EC281C8981CAF19112B65E8557BBD9145C5E67DC31BD90B77D833ECD35DA58D6AB3BE36AFE3AD318BDFB0362CCAC1F9CB53EE08F7B32D6122BD998582&locid=8b16de27-e818-47c9-bba6-d2aa4b1c4ab8&size=23629915&ocid=284106668"
 }
 ]

@@ -116,14 +116,6 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                 builder.append(taskInfo.name);
             }
 
-            if (!TextUtils.isEmpty(taskInfo.time)) {
-                builder.append("\n");
-                tmp = getResources().getString(R.string.tasktime);
-                builder.append(tmp);
-                builder.append(" ");
-                builder.append(taskInfo.time);
-            }
-
             if (!TextUtils.isEmpty(taskInfo.interval)) {
                 builder.append("\n");
                 tmp = getResources().getString(R.string.taskinterval);
@@ -148,6 +140,21 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
                 builder.append(taskInfo.ip);
             }
         }
+        if (mCurrentFragment != null) {
+            long totalTime = mCurrentFragment.getTotalTime();
+            builder.append("\n");
+            tmp = getResources().getString(R.string.tasktime);
+            builder.append(tmp);
+            builder.append(" ");
+            builder.append(totalTime);
+            long leftTime = mCurrentFragment.getLeftTime();
+            leftTime = (long) ((double)leftTime / 1000);
+            builder.append("\n");
+            tmp = getResources().getString(R.string.consumetime);
+            builder.append(tmp);
+            builder.append(" ");
+            builder.append(leftTime);
+        }
         mShowStatusView.setText(builder.toString());
         mShowStatusView.setVisibility(View.VISIBLE);
         mHandler.postDelayed(mDismissRunnable, 10 * 1000);
@@ -156,6 +163,9 @@ public class TVAppActivity extends FragmentActivity implements OnTaskRequestComp
     private void showStatusInfo() {
         if (mShowStatusView.getVisibility() != View.VISIBLE) {
             showDebugString();
+        } else {
+            mShowStatusView.setVisibility(View.INVISIBLE);
+            mHandler.removeCallbacks(mDismissRunnable);
         }
     }
 

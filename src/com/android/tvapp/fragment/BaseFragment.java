@@ -59,6 +59,22 @@ public class BaseFragment extends Fragment {
         mHandler.post(mCountDownRunnable);
     }
 
+    public long getLeftTime() {
+        long now = SystemClock.elapsedRealtime();
+        return now - mStartTime;
+    }
+
+    public long getTotalTime() {
+        long time = -1;
+        if (mTaskInfo != null) {
+            try {
+                time = Long.parseLong(mTaskInfo.time);
+            } catch(NumberFormatException e) {
+            }
+        }
+        return time;
+    }
+
     public void pauseTask() {
         Log.d(Log.TAG, "");
         mHandler.removeCallbacks(mCountDownRunnable);
