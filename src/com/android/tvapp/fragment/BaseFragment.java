@@ -14,6 +14,7 @@ public class BaseFragment extends Fragment {
     protected Handler mHandler;
     protected long mStartTime;
     protected long mLeftTime;
+    private long mConsumeTime = 0;
 
     public BaseFragment() {
         mHandler = new Handler();
@@ -60,8 +61,7 @@ public class BaseFragment extends Fragment {
     }
 
     public long getLeftTime() {
-        long now = SystemClock.elapsedRealtime();
-        return now - mStartTime;
+        return mConsumeTime;
     }
 
     public long getTotalTime() {
@@ -94,6 +94,12 @@ public class BaseFragment extends Fragment {
         public void run() {
             long now = SystemClock.elapsedRealtime();
             // Log.d(Log.TAG, "now : " + now + " , s : " + mStartTime + " , l : " + mLeftTime);
+            long totalTime = getPresetLeftTime();
+            if (totalTime > 0) {
+                mConsumeTime = now - mStartTime + (totalTime - mLeftTime);
+            } else {
+                mConsumeTime = now - mStartTime;
+            }
             if (now - mStartTime > mLeftTime) {
                 sendCompleteBroadcast();
                 return;
